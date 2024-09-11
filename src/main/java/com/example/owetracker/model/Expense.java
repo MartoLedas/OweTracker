@@ -1,7 +1,8 @@
 package com.example.owetracker.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -12,40 +13,48 @@ public class Expense {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String title;
+
     private String description;
 
-    private double totalAmount;
+    private BigDecimal amount;
 
-    private LocalDate date;
+    @ManyToOne
+    @JoinColumn(name = "paid_by", referencedColumnName = "id")
+    private User paidBy;
+
+    @Column(name = "group_id")
+    private Long groupId;
+
+    private String status;
+
+    private String type;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @ManyToMany
     @JoinTable(
-            name = "expense_user",
+            name = "expense_users",
             joinColumns = @JoinColumn(name = "expense_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private List<User> participants;
 
-    @ManyToOne
-    @JoinColumn(name = "paid_by")
-    private User paidBy;
-
-    @ElementCollection
-    @CollectionTable(name = "expense_splits", joinColumns = @JoinColumn(name = "expense_id"))
-    @Column(name = "amount")
-    private List<Double> amountsOwed;
 
     public Expense() {
-
     }
 
-    public Expense(String description, double totalAmount, LocalDate date, List<User> participants, User paidBy, List<Double> amountsOwed) {
+    public Expense(String title, String description, BigDecimal amount, User paidBy, Long groupId, String status, String type, LocalDateTime createdAt, List<User> participants) {
+        this.title = title;
         this.description = description;
-        this.totalAmount = totalAmount;
-        this.date = date;
-        this.participants = participants;
+        this.amount = amount;
         this.paidBy = paidBy;
-        this.amountsOwed = amountsOwed;
+        this.groupId = groupId;
+        this.status = status;
+        this.type = type;
+        this.createdAt = createdAt;
+        this.participants = participants;
     }
 
     public Long getId() {
@@ -56,6 +65,14 @@ public class Expense {
         this.id = id;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -64,28 +81,12 @@ public class Expense {
         this.description = description;
     }
 
-    public double getTotalAmount() {
-        return totalAmount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    public void setTotalAmount(double totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public List<User> getParticipants() {
-        return participants;
-    }
-
-    public void setParticipants(List<User> participants) {
-        this.participants = participants;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
     public User getPaidBy() {
@@ -96,11 +97,43 @@ public class Expense {
         this.paidBy = paidBy;
     }
 
-    public List<Double> getAmountsOwed() {
-        return amountsOwed;
+    public Long getGroupId() {
+        return groupId;
     }
 
-    public void setAmountsOwed(List<Double> amountsOwed) {
-        this.amountsOwed = amountsOwed;
+    public void setGroupId(Long groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<User> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<User> participants) {
+        this.participants = participants;
     }
 }

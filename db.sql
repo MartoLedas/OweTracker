@@ -50,7 +50,7 @@ CREATE TABLE expenses (
 );
 
 -- Table: transactions
-CREATE TABLE transactions (
+CREATE TABLE expense_users (
     id SERIAL PRIMARY KEY,
     amount DOUBLE PRECISION NOT NULL,
     from_user_id INTEGER NOT NULL,
