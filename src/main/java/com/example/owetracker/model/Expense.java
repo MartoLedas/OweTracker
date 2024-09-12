@@ -28,7 +28,6 @@ public class Expense {
 
     private String status;
 
-    private String type;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -45,14 +44,13 @@ public class Expense {
     public Expense() {
     }
 
-    public Expense(String title, String description, BigDecimal amount, User paidBy, Long groupId, String status, String type, LocalDateTime createdAt, List<User> participants) {
+    public Expense(String title, String description, BigDecimal amount, User paidBy, Long groupId, String status, LocalDateTime createdAt, List<User> participants) {
         this.title = title;
         this.description = description;
         this.amount = amount;
         this.paidBy = paidBy;
         this.groupId = groupId;
         this.status = status;
-        this.type = type;
         this.createdAt = createdAt;
         this.participants = participants;
     }
@@ -111,14 +109,6 @@ public class Expense {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public LocalDateTime getCreatedAt() {
