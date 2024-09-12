@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -81,6 +83,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating profile: " + e.getMessage());
         }
     }
+
+    // In UserController.java
+    @GetMapping("/search")
+    public List<User> searchUsers(@RequestParam String query) {
+        return userService.searchUsers(query);
+    }
+
 
 
 }

@@ -52,4 +52,9 @@ public class WebController {
     public String showHomePage() {
         return "home"; // This should return home.html from src/main/resources/templates/
     }
+
+    @GetMapping("/friends")
+    public String showFriendsPage() {
+        return "friends";
+    }
 }
