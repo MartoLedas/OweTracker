@@ -50,7 +50,7 @@ CREATE TABLE expenses (
 );
 
 -- Table: transactions
-CREATE TABLE transactions (
+CREATE TABLE expense_users (
     id SERIAL PRIMARY KEY,
     amount DOUBLE PRECISION NOT NULL,
     from_user_id INTEGER NOT NULL,
@@ -62,16 +62,4 @@ CREATE TABLE transactions (
     CONSTRAINT fk_from_user FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_expense FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE
-);
-
--- Table: notifications
-CREATE TABLE notifications (
-    id SERIAL PRIMARY KEY,
-    from_user_id INTEGER NOT NULL,
-    to_user_id INTEGER NOT NULL,
-    message VARCHAR NOT NULL,
-    is_read BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_from_user FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE
 );
