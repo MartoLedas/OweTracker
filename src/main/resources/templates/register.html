@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Link to CSS file -->
+</head>
+<body>
+<header>
+    <h1>OweTracker</h1>
+    <nav>
+        <a href="/register" >Register</a> |
+        <a href="/login" >Login</a> |
+        <a href="/profile">Profile</a> |
+        <form action="/api/users/logout" method="post" style="display:inline;" >
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+
+
+<main>
+    <h1>Register</h1>
+    <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required minlength="4">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required minlength="6" pattern="(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}">
+        <br>
+        <button type="submit">Register</button>
+    </form>
+    <p id="message"></p>
+    <button onclick="window.location.href='/login'">Login</button>
+</main>
+<script>
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+
+        // Get the form values
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+        const name = document.getElementById('name').value;
+
+        // Basic validation
+        if (username.length < 4) {
+            document.getElementById('message').innerText = 'Username must be at least 4 characters long.';
+            return;
+        }
+        if (password.length < 6 || !/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+            document.getElementById('message').innerText = 'Password must be at least 6 characters long and contain both letters and numbers.';
+            return;
+        }
+
+        // Create the JSON payload
+        const data = {
+            username: username,
+            password: password,
+            email: email,
+            name: name
+        };
+
+        // Send the POST request using fetch API
+        fetch('http://localhost:8080/api/users/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.text())
+        .then(result => {
+            document.getElementById('message').innerText = result;
+            // If registration is successful, redirect to the login page
+            if (result.includes("User registered successfully")) {
+                window.location.href = '/login'; // Redirect to login page
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('message').innerText = 'Registration failed. Please try again.';
+        });
+    });
+</script>
+</body>
+</html>
