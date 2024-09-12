@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+<h1>Login</h1>
+<form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Login</button>
+</form>
+
+<p id="message"></p>
+<button onclick="window.location.href='/register.html'">Register</button>
+
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the form from submitting the traditional way
+
+        // Get the form values
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        // Create the JSON payload
+        const data = {
+            username: username,
+            password: password
+        };
+
+        // Send the POST request using fetch API
+        fetch('http://localhost:8080/api/users/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text(); // Assuming the server sends a success message
+            } else {
+                throw new Error('Invalid login credentials');
+            }
+        })
+        .then(result => {
+            document.getElementById('message').innerText = result;
+            // If login is successful, redirect to the home page
+            if (result === "Login successful") {
+                window.location.href = '/home.html'; // Redirect to home page (you need to create home.html)
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('message').innerText = 'Login failed. Please check your credentials and try again.';
+        });
+    });
+</script>
+</body>
+</html>
