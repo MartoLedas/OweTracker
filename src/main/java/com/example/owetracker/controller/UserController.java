@@ -5,8 +5,10 @@ import com.example.owetracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
 @RequestMapping("/api/users")
@@ -29,11 +31,13 @@ public class UserController {
 
     // Register a new user
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user, Model model) {
         try {
             userService.registerUser(user);
+            model.addAttribute("message", "User registered successfully");
             return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
         } catch (RuntimeException e) {
+            model.addAttribute("message", "Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
@@ -50,5 +54,14 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+
+
+
+    // Logout
+    @PostMapping("/logout")
+    public RedirectView logoutUser(HttpSession session) {
+        session.invalidate(); // Invalidate the session
+        return new RedirectView("/login.html"); // Redirect to the login page
     }
 }
