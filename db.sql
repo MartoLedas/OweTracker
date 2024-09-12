@@ -54,12 +54,11 @@ CREATE TABLE expense_users (
     id SERIAL PRIMARY KEY,
     amount DOUBLE PRECISION NOT NULL,
     from_user_id INTEGER NOT NULL,
-    to_user_id INTEGER NOT NULL,
+--     to_user_id INTEGER NOT NULL, -- you can get paid_by from expenses table
     expense_id INTEGER NOT NULL,
     status VARCHAR NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_debt BOOLEAN NOT NULL, -- true: debt, false: paying debt (transaction)
     CONSTRAINT fk_from_user FOREIGN KEY (from_user_id) REFERENCES users(id) ON DELETE CASCADE,
-    CONSTRAINT fk_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
+    --CONSTRAINT fk_to_user FOREIGN KEY (to_user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_expense FOREIGN KEY (expense_id) REFERENCES expenses(id) ON DELETE CASCADE
 );

@@ -16,10 +16,10 @@ public class ExpenseUser {
     private Expense expense;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "from_user_id", nullable = false)
     private User user;
 
-    @Column(name = "amount_owed", nullable = false)
+    @Column(name = "amount", nullable = false)
     private BigDecimal amountOwed;
 
     @Column(name = "status", nullable = false)

@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.owetracker.model.User;
 import com.example.owetracker.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,26 @@ public class ExpenseService {
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
 
+    @Transactional
+    public Expense createExpense(Expense expense, List<Long> participantIds, List<BigDecimal> amountsOwed) {
+        expense.setCreatedAt(LocalDateTime.now());
+        expense.setStatus("pending");
+        Expense savedExpense = expenseRepository.save(expense);
+
+        for (int i = 0; i < participantIds.size(); i++) {
+            Long userId = participantIds.get(i);
+            BigDecimal amountOwed = amountsOwed.get(i);
+
+            User participant = userRepository.findById(Math.toIntExact(userId))
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            ExpenseUser expenseUser = new ExpenseUser(savedExpense, participant, amountOwed, "pending");
+            expenseUserRepository.save(expenseUser);
+        }
+
+        return savedExpense;
+    }
+
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
@@ -35,6 +57,10 @@ public class ExpenseService {
     }
 
     public Expense createExpense(Expense expense) {
+        return expenseRepository.save(expense);
+    }
+
+    public Expense save(Expense expense) {
         return expenseRepository.save(expense);
     }
 
