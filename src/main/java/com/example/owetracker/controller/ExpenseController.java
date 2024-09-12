@@ -116,7 +116,7 @@ public class ExpenseController {
             expenseService.save(savedExpense);
         }
 
-        return "redirect:/expenses";
+        return "redirect:/home"; //change to "redirect:/expenses" later or create success message page
     }
 
 

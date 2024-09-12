@@ -27,26 +27,6 @@ public class ExpenseService {
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
 
-//    @Transactional
-//    public Expense createExpense(Expense expense, List<Long> participantIds, List<BigDecimal> amountsOwed) {
-//        expense.setCreatedAt(LocalDateTime.now());
-//        expense.setStatus("pending");
-//        Expense savedExpense = expenseRepository.save(expense);
-//
-//        for (int i = 0; i < participantIds.size(); i++) {
-//            Long userId = participantIds.get(i);
-//            BigDecimal amountOwed = amountsOwed.get(i);
-//
-//            User participant = userRepository.findById(Math.toIntExact(userId))
-//                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-//
-//            ExpenseUser expenseUser = new ExpenseUser(savedExpense, participant, amountOwed, "pending");
-//            expenseUserRepository.save(expenseUser);
-//        }
-//
-//        return savedExpense;
-//    }
-
     @Transactional
     public Expense createExpense(Expense expense, List<Integer> participantIds, List<BigDecimal> amountsOwed, boolean splitEqually, BigDecimal totalAmount) {
         expense.setCreatedAt(LocalDateTime.now());
