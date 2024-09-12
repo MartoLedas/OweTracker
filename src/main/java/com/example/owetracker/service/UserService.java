@@ -1,6 +1,7 @@
 package com.example.owetracker.service;
 
 import com.example.owetracker.model.User;
+import com.example.owetracker.model.UserProfileUpdateRequest;
 import com.example.owetracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +28,7 @@ public class UserService {
     }
 
     public User registerUser(User user) {
+        System.out.println("Registering user: " + user.getUsername() + "  " + user.getEmail());
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new RuntimeException("Username is already taken");
         }
@@ -48,4 +50,31 @@ public class UserService {
         }
         return false;
     }
+
+    public void updateUserProfile(Integer userId, UserProfileUpdateRequest updateRequest) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+
+            // Update name and email
+            user.setName(updateRequest.getName());
+            user.setEmail(updateRequest.getEmail());
+
+            // If password change is requested
+            if (updateRequest.getCurrentPassword() != null && updateRequest.getNewPassword() != null) {
+                if (passwordEncoder.matches(updateRequest.getCurrentPassword(), user.getPassword())) {
+                    String encodedNewPassword = passwordEncoder.encode(updateRequest.getNewPassword());
+                    user.setPassword(encodedNewPassword);
+                } else {
+                    throw new RuntimeException("Current password is incorrect.");
+                }
+            }
+
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found.");
+        }
+    }
+
+
 }

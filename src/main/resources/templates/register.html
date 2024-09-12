@@ -10,19 +10,27 @@
 <header>
     <h1>OweTracker</h1>
     <nav>
-        <a href="/register">Register</a> |
-        <a href="/login">Login</a> |
+        <a href="/register" >Register</a> |
+        <a href="/login" >Login</a> |
         <a href="/profile">Profile</a> |
-        <form action="/api/users/logout" method="post" style="display:inline;">
+        <form action="/api/users/logout" method="post" style="display:inline;" >
             <button type="submit">Logout</button>
         </form>
     </nav>
 </header>
+
+
 <main>
     <h1>Register</h1>
     <form id="registerForm">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required minlength="4">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <br>
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
         <br>
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required minlength="6" pattern="(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}">
@@ -39,6 +47,8 @@
         // Get the form values
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+        const email = document.getElementById('email').value;
+        const name = document.getElementById('name').value;
 
         // Basic validation
         if (username.length < 4) {
@@ -53,7 +63,9 @@
         // Create the JSON payload
         const data = {
             username: username,
-            password: password
+            password: password,
+            email: email,
+            name: name
         };
 
         // Send the POST request using fetch API

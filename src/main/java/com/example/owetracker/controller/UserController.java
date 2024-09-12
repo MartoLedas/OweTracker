@@ -1,6 +1,7 @@
 package com.example.owetracker.controller;
 
 import com.example.owetracker.model.User;
+import com.example.owetracker.model.UserProfileUpdateRequest;
 import com.example.owetracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,4 +65,22 @@ public class UserController {
         session.invalidate(); // Invalidate the session
         return new RedirectView("/login"); // Redirect to the login page
     }
+
+    // Update the user profile
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateUserProfile(@RequestBody UserProfileUpdateRequest updateRequest, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please log in first.");
+        }
+
+        try {
+            userService.updateUserProfile(userId, updateRequest);
+            return ResponseEntity.ok("Profile updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error updating profile: " + e.getMessage());
+        }
+    }
+
+
 }
