@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Link to CSS file -->
+</head>
+<body>
+<header>
+    <h1>OweTracker</h1>
+    <nav>
+        <a href="/register">Register</a> |
+        <a href="/login">Login</a> |
+        <a href="/profile">Profile</a> |
+        <form action="/api/users/logout" method="post" style="display:inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+<main>
+    <h1>User Profile</h1>
+    <div th:if="${user}">
+        <p>Username: <span th:text="${user.username}"></span></p>
+        <p>Role: <span th:text="${user.role}"></span></p>
+        <p>Created At: <span th:text="${user.createdAt}"></span></p>
+    </div>
+</main>
+</body>
+</html>

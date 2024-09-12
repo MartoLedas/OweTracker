@@ -4,22 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="/styles.css"> <!-- Link to CSS file -->
 </head>
 <body>
-<h1>Register</h1>
-<form id="registerForm">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
-    <br>
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
-    <br>
-    <button type="submit">Register</button>
-</form>
-
-<p id="message"></p>
-<button onclick="window.location.href='/login.html'">Login</button>
-
+<header>
+    <h1>OweTracker</h1>
+    <nav>
+        <a href="/register">Register</a> |
+        <a href="/login">Login</a> |
+        <a href="/profile">Profile</a> |
+        <form action="/api/users/logout" method="post" style="display:inline;">
+            <button type="submit">Logout</button>
+        </form>
+    </nav>
+</header>
+<main>
+    <h1>Register</h1>
+    <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required minlength="4">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required minlength="6" pattern="(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}">
+        <br>
+        <button type="submit">Register</button>
+    </form>
+    <p id="message"></p>
+    <button onclick="window.location.href='/login'">Login</button>
+</main>
 <script>
     document.getElementById('registerForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevent the form from submitting the traditional way
@@ -27,6 +39,16 @@
         // Get the form values
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
+
+        // Basic validation
+        if (username.length < 4) {
+            document.getElementById('message').innerText = 'Username must be at least 4 characters long.';
+            return;
+        }
+        if (password.length < 6 || !/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
+            document.getElementById('message').innerText = 'Password must be at least 6 characters long and contain both letters and numbers.';
+            return;
+        }
 
         // Create the JSON payload
         const data = {
@@ -47,7 +69,7 @@
             document.getElementById('message').innerText = result;
             // If registration is successful, redirect to the login page
             if (result.includes("User registered successfully")) {
-                window.location.href = '/login.html'; // Redirect to login page
+                window.location.href = '/login'; // Redirect to login page
             }
         })
         .catch(error => {

@@ -62,6 +62,6 @@ public class UserController {
     @PostMapping("/logout")
     public RedirectView logoutUser(HttpSession session) {
         session.invalidate(); // Invalidate the session
-        return new RedirectView("/login.html"); // Redirect to the login page
+        return new RedirectView("/login"); // Redirect to the login page
     }
 }
