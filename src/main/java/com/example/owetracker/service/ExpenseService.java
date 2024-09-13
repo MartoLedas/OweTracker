@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.owetracker.model.User;
 import com.example.owetracker.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +27,37 @@ public class ExpenseService {
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
 
+    @Transactional
+    public Expense createExpense(Expense expense, List<Integer> participantIds, List<BigDecimal> amountsOwed, boolean splitEqually, BigDecimal totalAmount) {
+        expense.setCreatedAt(LocalDateTime.now());
+        expense.setStatus("pending");
+        Expense savedExpense = expenseRepository.save(expense);
+
+        if (splitEqually) {
+            BigDecimal equalAmount = totalAmount.divide(BigDecimal.valueOf(participantIds.size()));
+            for (Integer userId : participantIds) {
+                User participant = userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, participant, equalAmount, "pending");
+                expenseUserRepository.save(expenseUser);
+            }
+        } else {
+            for (int i = 0; i < participantIds.size(); i++) {
+                Integer userId = participantIds.get(i);
+                BigDecimal amountOwed = amountsOwed.get(i);
+
+                User participant = userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, participant, amountOwed, "pending");
+                expenseUserRepository.save(expenseUser);
+            }
+        }
+
+        return savedExpense;
+    }
+
+
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
@@ -34,7 +67,7 @@ public class ExpenseService {
         return expense.orElse(null);
     }
 
-    public Expense createExpense(Expense expense) {
+    public Expense save(Expense expense) {
         return expenseRepository.save(expense);
     }
 

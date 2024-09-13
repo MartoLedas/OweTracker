@@ -24,6 +24,11 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    public User findById(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        return user.orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
@@ -78,6 +83,10 @@ public class UserService {
     }
     public List<User> searchUsers(String query) {
         return userRepository.findByUsernameContainingIgnoreCase(query);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
 

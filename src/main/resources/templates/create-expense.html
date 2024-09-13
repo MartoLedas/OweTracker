@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="">
+<head>
+  <title>Create Expense</title>
+  <script>
+    function toggleAmountInput() {
+      const splitEqually = document.getElementById("splitEqually").checked;
+      const totalAmountField = document.getElementById("totalAmountField");
+      const userAmountFields = document.querySelectorAll(".user-amount");
+
+      if (splitEqually) {
+        totalAmountField.style.display = "block";
+        userAmountFields.forEach(field => field.style.display = "none");
+      } else {
+        totalAmountField.style.display = "none";
+        userAmountFields.forEach(field => field.style.display = "block");
+      }
+    }
+
+    function addUser() {
+      const userDropdown = document.getElementById("userDropdown");
+      const selectedUserId = userDropdown.value;
+      const selectedUserText = userDropdown.options[userDropdown.selectedIndex].text;
+
+      const existingUser = document.querySelector(`#user-${selectedUserId}`);
+      if (existingUser) {
+        alert("User already added!");
+        return;
+      }
+
+      const userDiv = document.createElement("div");
+      userDiv.setAttribute("id", `user-${selectedUserId}`);
+      userDiv.innerHTML = `
+                <label>${selectedUserText}</label>
+                <input type="hidden" name="users" value="${selectedUserId}" />
+                <input type="number" name="userAmounts" class="user-amount" step="0.01" min="0" placeholder="Enter amount" required />
+                <button type="button" onclick="removeUser(${selectedUserId})">Remove</button>
+            `;
+
+      document.getElementById("selectedUsers").appendChild(userDiv);
+    }
+
+    function removeUser(userId) {
+      const userDiv = document.getElementById(`user-${userId}`);
+      userDiv.remove();
+    }
+  </script>
+</head>
+<body>
+<h1>Create New Expense</h1>
+
+<form th:action="@{/expenses/save}" method="post">
+  <div>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" th:value="${expense.title}" required/><br/><br/>
+  </div>
+
+  <div>
+    <label for="description">Description:</label>
+    <textarea id="description" name="description" th:text="${expense.description}"></textarea><br/><br/>
+  </div>
+
+  <!-- Split Equally Checkbox -->
+  <div>
+    <label for="splitEqually">Split Equally:</label>
+    <input type="checkbox" id="splitEqually" name="splitEqually" onclick="toggleAmountInput()" />
+  </div>
+
+  <!-- Total Amount (only visible if 'Split Equally' is checked) -->
+  <div id="totalAmountField" style="display:none;">
+    <label for="totalAmount">Total Amount:</label>
+    <input type="number" id="totalAmount" name="totalAmount" step="0.01" min="0" /><br/><br/>
+  </div>
+
+  <!-- Dropdown to select users -->
+  <div>
+    <label for="userDropdown">Add User:</label>
+    <select id="userDropdown">
+      <option th:each="user : ${allUsers}" th:value="${user.id}" th:text="${user.username}"></option>
+    </select>
+    <button type="button" onclick="addUser()">Add</button><br/><br/>
+  </div>
+
+  <!-- Selected Users List (Dynamically added users will appear here) -->
+  <div id="selectedUsers"></div>
+
+  <!-- Hidden field for the logged-in user (expense owner) -->
+<!--  <input type="hidden" id="ownerId" name="ownerId" th:value="${loggedInUser.id}" />-->
+
+  <!-- Submit button -->
+  <div>
+    <input type="submit" value="Create Expense" />
+  </div>
+</form>
+</body>
+</html>
