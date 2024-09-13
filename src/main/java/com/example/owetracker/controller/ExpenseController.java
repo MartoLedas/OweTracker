@@ -5,6 +5,7 @@ import com.example.owetracker.model.ExpenseUser;
 import com.example.owetracker.model.User;
 import com.example.owetracker.service.ExpenseService;
 import com.example.owetracker.service.ExpenseUserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -65,6 +66,7 @@ public class ExpenseController {
 
     @PostMapping("/save")
     public String saveExpense(
+            HttpSession session,
             //@RequestParam Integer ownerId,
             @RequestParam String title,
             @RequestParam String description,
@@ -74,8 +76,7 @@ public class ExpenseController {
             @RequestParam(required = false) List<BigDecimal> userAmounts  // Custom amounts per user
             ) {
 
-        // hardcoding the logged-in user ID to 16 for now, change later
-        Integer ownerId = 16;
+        Integer ownerId = (Integer) session.getAttribute("userId");
 
         Expense expense = new Expense();
         expense.setTitle(title);
