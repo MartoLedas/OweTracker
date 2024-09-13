@@ -57,4 +57,10 @@ public class WebController {
     public String showFriendsPage() {
         return "friends";
     }
+
+    @GetMapping("/expense")
+    public String showExpenseForm(Model model) {
+        model.addAttribute("message", "");
+        return "expense"; // returns html page
+    }
 }
