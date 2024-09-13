@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>DeptApp - View and Manage Expenses</title>
+    <link rel="stylesheet" href="/css/styles.css"> <!-- Link your CSS here -->
+    <style>
+        /* Quick inline styling */
+        body {
+          font-family: Arial, sans-serif;
+        }
+
+        header {
+          width: 49%;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px;
+          background-color: #f8f9fa;
+          border-bottom: 1px solid #dee2e6;
+        }
+
+        header .logo {
+          font-weight: bold;
+          font-size: 1.5em;
+        }
+
+        header .icons {
+          display: flex;
+          gap: 15px;
+        }
+
+        .icon {
+          font-size: 1.2em;
+          cursor: pointer;
+        }
+
+        table {
+          width: 50%;
+          border-collapse: collapse;
+          margin: 20px 0;
+        }
+
+        table, th, td {
+          border: 1px solid #ddd;
+        }
+
+        th, td {
+          padding: 12px;
+          text-align: left;
+        }
+
+        th {
+          background-color: #f2f2f2;
+        }
+
+        .amount-positive {
+          color: green;
+        }
+
+        .amount-negative {
+          color: red;
+        }
+
+        .group {
+          font-weight: bold;
+        }
+
+        .details-btn {
+          padding: 5px 10px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          cursor: pointer;
+        }
+
+        .details-btn:hover {
+          background-color: #0056b3;
+        }
+
+        .scrollable-table {
+          max-height: 400px;
+          overflow-y: auto;
+          display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">OweTracker</div>
+    <div class="icons">
+        <span class="icon">☰ <!-- Menu icon --></span>
+        <span class="icon">🔍 <!-- Filter icon --></span>
+        <span class="icon">⇅ <!-- Sort icon --></span>
+    </div>
+</header>
+
+<section>
+    <div class="scrollable-table">
+        <table>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Payment to/from</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Row 1 -->
+            <tr>
+                <td>12.09.2024</td>
+                <td>Cinema</td>
+                <td>Cinamon</td>
+                <td><span class="amount-positive">+200</span></td>
+                <td><span class="group">GROUP_A</span></td>
+                <td>Active</td>
+                <td><button class="details-btn" onclick="showDetails('GROUP_A')">Details</button></td>
+            </tr>
+            <!-- Row 2 -->
+            <tr>
+                <td>08.09.2024</td>
+                <td>Cafe</td>
+                <td>Lunch</td>
+                <td><span class="amount-negative">-50.43</span></td>
+                <td><span class="group">GROUP_B</span></td>
+                <td>Partly Paid</td>
+                <td><button class="details-btn" onclick="showDetails('GROUP_A')">Details</button></td>
+            </tr>
+            <!-- Row 3 -->
+            <tr>
+                <td>15.05.2024</td>
+                <td>Shop</td>
+                <td>Fruits</td>
+                <td><span class="amount-negative">-15.43</span></td>
+                <td>John</td>
+                <td>Paid</td>
+                <td><button class="details-btn" onclick="showDetails('John')">Details</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Details Modal -->
+<div id="details-modal" style="display:none; position:fixed; top:30%; left:30%; transform:translate(-50%, -50%); background:white; padding:20px; border: 1px solid #ddd;">
+    <h2>Transaction Details</h2>
+    <p id="details-content"></p>
+    <button onclick="closeDetails()">Close</button>
+</div>
+
+<script>
+    function showDetails(group) {
+      // Logic to display group details
+      var detailsContent = document.getElementById("details-content");
+
+      if (group === "GROUP_A") {
+        detailsContent.innerHTML = "<strong>GROUP_A Members:</strong><br> - John: $50<br> - Sarah: $75<br> - Mike: $75<br>Total: $200";
+      } if (group === "GROUP_B") {
+        detailsContent.innerHTML = "<strong>GROUP_B Members:</strong><br> - Anna: $10<br> - Sarah: $20<br> - Mike: $20.43<br>Total: $50.43";
+      } else if (group === "John") {
+        detailsContent.innerHTML = "<strong>Payment from/to John:</strong><br>Total: $15.43";
+      }
+
+      document.getElementById("details-modal").style.display = 'block';
+    }
+
+    function closeDetails() {
+      document.getElementById("details-modal").style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
