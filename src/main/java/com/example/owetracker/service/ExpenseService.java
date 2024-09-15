@@ -135,7 +135,7 @@ public class ExpenseService {
         return expenseRepository.findByGroupId(groupId);
     }
 
-    public List<Expense> getExpensesPaidByUser(Long userId) {
+    public List<Expense> getExpensesPaidByUser(Integer userId) {
         return expenseRepository.findByPaidById(userId);
     }
 
