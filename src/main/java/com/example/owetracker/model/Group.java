@@ -1,15 +1,24 @@
 package com.example.owetracker.model;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "groups")
 public class Group {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String title;
-    private Integer created_by;
+    @Column(name = "created_by")
+    private Integer createdBy;
 
-    public Group(Integer id, String title, Integer created_by) {
-        this.id = id;
+    public Group(String title, Integer created_by) {
         this.title = title;
-        this.created_by = created_by;
+        this.createdBy = created_by;
+    }
+
+    public Group() {
     }
 
     public Integer getId() {
@@ -28,11 +37,11 @@ public class Group {
         this.title = title;
     }
 
-    public Integer getCreated_by() {
-        return created_by;
+    public Integer getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreated_by(Integer created_by) {
-        this.created_by = created_by;
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
     }
 }
