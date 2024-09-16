@@ -69,8 +69,23 @@ public class GroupController {
 
         groupService.addUsersToGroup(savedGroup, selectedUsers);
 
-        return "redirect:/groups";
+        return "redirect:/groups/my-groups";
     }
+
+    @GetMapping("/groups/my-groups")
+    public String listUserGroups(HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        List<Group> userGroups = groupService.findGroupsByUserId(userId);
+        model.addAttribute("userGroups", userGroups);
+
+        return "my-groups";
+    }
+
 
 
 }

@@ -35,8 +35,8 @@ public class GroupService {
         }
     }
 
-    public List<Group> findAllGroups() {
-        return groupRepository.findAll();
+    public List<Group> findGroupsByUserId(Integer userId) {
+        return groupRepository.findGroupsByUserId(userId);
     }
 
     public List<Group> searchGroupByTitle(String partialTitle){
