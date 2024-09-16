@@ -23,14 +23,22 @@ public class FriendController {
         Integer userId = (Integer) session.getAttribute("userId");  // Get logged-in user's ID from session
         Integer friendId = payload.get("friendId");  // Get friend's ID from request body
 
-        if (userId != null && friendId != null) {
-
-            friendService.addFriend(userId, friendId);
-            return ResponseEntity.ok("Friend added successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID or user not logged in");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
         }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        if (userId.equals(friendId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You cannot add yourself as a friend");
+        }
+
+        friendService.addFriend(userId, friendId);
+        return ResponseEntity.ok("Friend added successfully");
     }
+
 
     @GetMapping("/list")
     public List<User> getUserFriends(HttpSession session) {

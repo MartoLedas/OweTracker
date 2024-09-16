@@ -49,13 +49,21 @@ public class WebController {
 
 
     @GetMapping("/home")
-    public String showHomePage() {
-        return "home"; // This should return home.html from src/main/resources/templates/
+    public String showHomePage(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null) {
+            return "home";
+        }
+        return "redirect:/login"; // Redirect to login if user is not logged in
     }
 
     @GetMapping("/friends")
-    public String showFriendsPage() {
-        return "friends";
+    public String showFriendsPage(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null) {
+            return "friends";
+        }
+        return "redirect:/login"; // Redirect to login if user is not logged in
     }
 
     @GetMapping("/expense")

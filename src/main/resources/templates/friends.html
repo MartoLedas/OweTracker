@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body>
+<input type="hidden" id="currentUserId" value="${currentUserId}" />
+
 <!-- Header with Navigation -->
 <header class="bg-light py-3 mb-4 border-bottom">
     <div class="container">
@@ -100,22 +102,31 @@
 
     // Function to add a friend
     function addFriend(friendId) {
-        fetch('/api/friends/add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ friendId: friendId })
-        })
-        .then(response => response.text())
-        .then(result => {
-            alert(result);
-            location.reload(); // Reload the page to update the friends list
-        })
-        .catch(error => {
-            console.error('Error adding friend:', error);
-        });
+    // Get the current user's ID (this should be retrieved from session or server)
+    const currentUserId = parseInt(document.getElementById('currentUserId').value, 10);
+
+    if (friendId === currentUserId) {
+        alert('You cannot add yourself as a friend.');
+        return;
     }
+
+    fetch('/api/friends/add', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ friendId: friendId })
+    })
+    .then(response => response.text())
+    .then(result => {
+        alert(result);
+        location.reload(); // Reload the page to update the friends list
+    })
+    .catch(error => {
+        console.error('Error adding friend:', error);
+    });
+}
+
 </script>
 
 </body>
