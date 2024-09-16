@@ -45,9 +45,15 @@ public class GroupController {
     ) {
         Integer createdBy = (Integer) session.getAttribute("userId");
 
-
         if (users == null || users.isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "A group must have at least one member.");
+            redirectAttributes.addFlashAttribute("errorMessage", "A group must have at least one member besides you.");
+            return "redirect:/groups/create";
+        }
+
+        users.remove(createdBy); //if only creator is in the group it should count as empty group
+
+        if (users.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "A group must have at least one member besides you.");
             return "redirect:/groups/create";
         }
 
@@ -57,6 +63,9 @@ public class GroupController {
 
         Group group = new Group(title, createdBy);
         Group savedGroup = groupService.createGroup(group);
+
+        User creator = userService.findById(createdBy); //also add creator as member
+        selectedUsers.add(creator);
 
         groupService.addUsersToGroup(savedGroup, selectedUsers);
 
