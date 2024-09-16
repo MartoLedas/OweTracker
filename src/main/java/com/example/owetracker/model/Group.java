@@ -13,9 +13,9 @@ public class Group {
     @Column(name = "created_by")
     private Integer createdBy;
 
-    public Group(String title, Integer created_by) {
+    public Group(String title, Integer createdBy) {
         this.title = title;
-        this.createdBy = created_by;
+        this.createdBy = createdBy;
     }
 
     public Group() {

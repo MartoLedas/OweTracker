@@ -11,6 +11,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,9 +40,17 @@ public class GroupController {
     public String createGroup(
             HttpSession session,
             @RequestParam String title,
-            @RequestParam List<Integer> users
+            @RequestParam(required = false) List<Integer> users,
+            RedirectAttributes redirectAttributes
     ) {
-        Integer createdBy = 16; //(Integer) session.getAttribute("userId");
+        Integer createdBy = (Integer) session.getAttribute("userId");
+
+
+        if (users == null || users.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "A group must have at least one member.");
+            return "redirect:/groups/create";
+        }
+
         List<User> selectedUsers = users.stream()
                 .map(userId -> userService.findById(userId))
                 .collect(Collectors.toList());
