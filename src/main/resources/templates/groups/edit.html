@@ -20,7 +20,7 @@
       <ul>
         <li th:each="member : ${members}">
           <span th:text="${member.username}"></span>
-          <form th:action="@{/groups/edit}" method="post" style="display:inline;">
+          <form th:if="${member.id != creatorId}" th:action="@{/groups/edit}" method="post" style="display:inline;">
             <input type="hidden" name="groupId" th:value="${group.id}" />
             <input type="hidden" name="usersToKick" th:value="${member.id}" />
             <button type="submit" name="action" value="kick" class="btn btn-danger btn-sm">Kick</button>
@@ -29,10 +29,6 @@
       </ul>
     </div>
     <button type="submit" name="action" value="rename" class="btn btn-primary">Save Changes</button>
-<!--    <form th:action="@{/groups/edit}" method="post" style="display:inline;">-->
-<!--      <input type="hidden" name="groupId" th:value="${group.id}" />-->
-<!--      <button type="submit" name="action" value="delete" class="btn btn-danger">Delete Group</button>-->
-<!--    </form>-->
     <form th:action="@{/groups/{groupId}/delete(groupId=${group.id})}" method="post">
       <button type="submit" class="btn btn-danger">Delete Group</button>
     </form>

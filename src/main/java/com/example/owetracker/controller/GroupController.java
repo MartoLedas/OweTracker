@@ -123,9 +123,11 @@ public class GroupController {
     public String editGroup(@PathVariable Integer groupId, Model model) {
         Group group = groupService.findById(groupId);
         List<User> members = groupService.findMembersByGroupId(groupId);
+        Integer creatorId = group.getCreatedBy();
 
         model.addAttribute("group", group);
         model.addAttribute("members", members);
+        model.addAttribute("creatorId", creatorId);
         model.addAttribute("allUsers", userService.getAllUsers());
 
         return "groups/edit";
@@ -146,9 +148,11 @@ public class GroupController {
                     redirectAttributes.addFlashAttribute("message", "Group renamed successfully.");
                     break;
                 case "kick":
-                    if (usersToKick != null) {
+                    if (usersToKick != null && !usersToKick.isEmpty()) {
                         groupService.removeUsersFromGroup(groupId, usersToKick);
-                        redirectAttributes.addFlashAttribute("message", "Users removed successfully.");
+                        redirectAttributes.addFlashAttribute("message", "User(s) kicked successfully.");
+                    } else {
+                        redirectAttributes.addFlashAttribute("errorMessage", "No users selected to kick.");
                     }
                     break;
                 case "delete":
@@ -160,11 +164,13 @@ public class GroupController {
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while updating the group.");
         }
 
         return "redirect:/groups";
     }
+
 
     @PostMapping("/groups/{groupId}/leave")
     public String leaveGroup(

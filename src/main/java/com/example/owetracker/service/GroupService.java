@@ -60,25 +60,15 @@ public class GroupService {
         groupRepository.save(group);
     }
 
-    public void removeUsersFromGroup(Integer groupId, List<Integer> userIds) {
-        groupMembershipRepository.deleteByGroupIdAndUserIdIn(groupId, userIds);
-    }
-
-    @Transactional
-    public void deleteGroup(Integer groupId) {
-        groupMembershipRepository.deleteByGroupId(groupId);
-
-        groupRepository.deleteById(groupId);
-    }
-
-//    public void removeUserFromGroup(Integer groupId, Integer userId) {
-//        if (!groupRepository.existsById(groupId)) {
-//            throw new EntityNotFoundException("Group not found with id: " + groupId);
-//        }
-//
-//        groupMembershipRepository.deleteByGroupIdAndUserId(groupId, userId);
-//
+//    public void removeUsersFromGroup(Integer groupId, List<Integer> userIds) {
+//        groupMembershipRepository.deleteByGroupIdAndUserIdIn(groupId, userIds);
 //    }
+
+    public void removeUsersFromGroup(Integer groupId, List<Integer> userIds) {
+        for (Integer userId : userIds) {
+            removeUserFromGroup(groupId, userId);
+        }
+    }
 
     public void removeUserFromGroup(Integer groupId, Integer userId) {
         GroupMembership membership = groupMembershipRepository.findByGroupIdAndUserId(groupId, userId);
@@ -94,6 +84,13 @@ public class GroupService {
         } else {
             throw new EntityNotFoundException("User is not part of this group.");
         }
+    }
+
+    @Transactional
+    public void deleteGroup(Integer groupId) {
+        groupMembershipRepository.deleteByGroupId(groupId);
+
+        groupRepository.deleteById(groupId);
     }
 
 
