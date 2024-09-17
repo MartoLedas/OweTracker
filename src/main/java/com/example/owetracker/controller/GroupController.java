@@ -9,10 +9,9 @@ import com.example.owetracker.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,7 +102,6 @@ public class GroupController {
         return "groups/list";
     }
 
-
     @GetMapping("/groups/details/{groupId}")
     public String getGroupDetails(@PathVariable Integer groupId, HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("userId");
@@ -136,10 +134,12 @@ public class GroupController {
     @PostMapping("/groups/edit")
     public String updateGroup(
             @RequestParam Integer groupId,
-            @RequestParam String title,
+            @RequestParam(value = "title", required = false, defaultValue = "defaultTitle") String title,
             @RequestParam(required = false) List<Integer> usersToKick,
+            @RequestParam(required = false) List<Integer> usersToAdd,
             @RequestParam(required = false) String action,
             RedirectAttributes redirectAttributes) {
+
 
         try {
             switch (action) {
@@ -153,6 +153,14 @@ public class GroupController {
                         redirectAttributes.addFlashAttribute("message", "User(s) kicked successfully.");
                     } else {
                         redirectAttributes.addFlashAttribute("errorMessage", "No users selected to kick.");
+                    }
+                    break;
+                case "add":
+                    if (usersToAdd != null && !usersToAdd.isEmpty()) {
+                        groupService.addUsersToGroup(groupId, usersToAdd);
+                        redirectAttributes.addFlashAttribute("message", "User(s) added successfully.");
+                    } else {
+                        redirectAttributes.addFlashAttribute("errorMessage", "No users selected to add.");
                     }
                     break;
                 case "delete":
@@ -170,6 +178,7 @@ public class GroupController {
 
         return "redirect:/groups";
     }
+
 
 
     @PostMapping("/groups/{groupId}/leave")

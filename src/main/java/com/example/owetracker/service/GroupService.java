@@ -6,6 +6,7 @@ import com.example.owetracker.model.GroupMembership;
 import com.example.owetracker.model.User;
 import com.example.owetracker.repository.GroupMembershipRepository;
 import com.example.owetracker.repository.GroupRepository;
+import com.example.owetracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ public class GroupService {
     private GroupRepository groupRepository;
     @Autowired
     private GroupMembershipRepository groupMembershipRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     public GroupService(GroupRepository groupRepository, GroupMembershipRepository groupMembershipRepository) {
         this.groupRepository = groupRepository;
@@ -54,15 +57,14 @@ public class GroupService {
         return groupMembershipRepository.findUsersByGroupId(groupId);
     }
 
-    public void updateGroupTitle(Integer groupId, String title) {
-        Group group = findById(groupId);
-        group.setTitle(title);
+    public void updateGroupTitle(Integer groupId, String newTitle) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+
+        group.setTitle(newTitle);
+
         groupRepository.save(group);
     }
-
-//    public void removeUsersFromGroup(Integer groupId, List<Integer> userIds) {
-//        groupMembershipRepository.deleteByGroupIdAndUserIdIn(groupId, userIds);
-//    }
 
     public void removeUsersFromGroup(Integer groupId, List<Integer> userIds) {
         for (Integer userId : userIds) {
@@ -92,6 +94,44 @@ public class GroupService {
 
         groupRepository.deleteById(groupId);
     }
+
+//    public void addUsersToGroup(Integer groupId, List<Integer> userIds) {
+//        Group group = groupRepository.findById(groupId)
+//                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+//
+//        for (Integer userId : userIds) {
+//            User user = userRepository.findById(userId)
+//                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+//
+//            if (groupMembershipRepository.findByGroupIdAndUserId(groupId, userId) == null) {
+//                GroupMembership membership = new GroupMembership(group, user);
+//                groupMembershipRepository.save(membership);
+//            }
+//        }
+//    }
+
+    public void addUsersToGroup(Integer groupId, List<Integer> userIds) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Group not found"));
+
+        for (Integer userId : userIds) {
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            GroupMembership existingMembership = groupMembershipRepository.findByGroupIdAndUserId(groupId, userId);
+
+            if (existingMembership == null) {
+                GroupMembership membership = new GroupMembership(group, user);
+                groupMembershipRepository.save(membership);
+                System.out.println("User with ID " + userId + " added to group.");
+            } else {
+                System.out.println("User with ID " + userId + " is already part of the group.");
+            }
+        }
+    }
+
+
+
 
 
 
