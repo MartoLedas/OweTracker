@@ -91,5 +91,21 @@ public class UserController {
     }
 
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteUser(@RequestParam Integer userId) {
+        // Check if the user owes money or is owed money
+        boolean hasPendingTransactions = userService.hasPendingTransactions(userId);
+
+        if (hasPendingTransactions) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot delete account with pending transactions.");
+        }
+
+        // Delete the user
+        userService.deleteUser(userId);
+
+        return ResponseEntity.ok("Account successfully deleted.");
+    }
+
+
 
 }
