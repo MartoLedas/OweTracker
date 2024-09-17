@@ -20,8 +20,9 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
 
     // Find all friends for a given user where the user is either the userId or the friendId
     List<Friend> findByUserIdOrFriendId(Integer userId, Integer friendId);
-    List<Friend> findByUserIdOrFriendIdAndStatus(Integer userId, Integer friendId, String status);
-
+    @Query("SELECT f FROM Friend f WHERE (f.userId = :userId OR f.friendId = :friendId) AND f.status = :status")
+    List<Friend> findByUserIdOrFriendIdAndStatus(@Param("userId") Integer userId, @Param("friendId") Integer friendId, @Param("status") String status);
+    
     @Query("SELECT SUM(e.amountOwed) FROM ExpenseUser e WHERE e.user.id = :userId")
     BigDecimal getTotalOwedByUser(@Param("userId") Integer userId);
 
