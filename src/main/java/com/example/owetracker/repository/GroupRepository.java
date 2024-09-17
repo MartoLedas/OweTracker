@@ -17,5 +17,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     @Query("SELECT g FROM Group g JOIN GroupMembership gm ON g = gm.group WHERE gm.user.id = :userId")
     List<Group> findGroupsByUserId(@Param("userId") Integer userId);
 
+    void deleteById(Integer groupId);
+
 
 }

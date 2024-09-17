@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    List<Expense> findByGroupId(Long groupId);
+    List<Expense> findByGroupId(Integer groupId);
 
     List<Expense> findByPaidById(Integer paidBy_id);
 

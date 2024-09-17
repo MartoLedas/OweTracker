@@ -71,23 +71,6 @@ public class ExpenseService {
         return expenseRepository.save(expense);
     }
 
-    public Expense updateExpense(Long id, Expense updatedExpense) {
-        Optional<Expense> existingExpense = expenseRepository.findById(id);
-
-        if (existingExpense.isPresent()) {
-            Expense expense = existingExpense.get();
-            expense.setTitle(updatedExpense.getTitle());
-            expense.setDescription(updatedExpense.getDescription());
-            expense.setAmount(updatedExpense.getAmount());
-            expense.setPaidBy(updatedExpense.getPaidBy());
-            expense.setGroupId(updatedExpense.getGroupId());
-            expense.setStatus(updatedExpense.getStatus());
-            return expenseRepository.save(expense);
-        } else {
-            return null;
-        }
-    }
-
     public void deleteExpense(Long id) {
         if (expenseRepository.existsById(id)) {
             expenseRepository.deleteById(id);
@@ -131,7 +114,7 @@ public class ExpenseService {
     }
 
 
-    public List<Expense> getExpensesByGroupId(Long groupId) {
+    public List<Expense> getExpensesByGroupId(Integer groupId) {
         return expenseRepository.findByGroupId(groupId);
     }
 
@@ -142,4 +125,9 @@ public class ExpenseService {
     public List<Expense> getExpensesByStatus(String status) {
         return expenseRepository.findByStatus(status);
     }
+
+    public List<Expense> findByGroupId(Integer groupId) {
+        return expenseRepository.findByGroupId(groupId);
+    }
+
 }

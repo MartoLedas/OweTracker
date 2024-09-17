@@ -1,20 +1,28 @@
 package com.example.owetracker.controller;
 
+import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.Group;
 import com.example.owetracker.model.User;
+import com.example.owetracker.service.ExpenseService;
 import com.example.owetracker.service.GroupService;
 import com.example.owetracker.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -24,6 +32,8 @@ public class GroupController {
     private GroupService groupService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private ExpenseService expenseService;
 
     public GroupController(GroupService groupService, UserService userService) {
         this.groupService = groupService;
@@ -69,10 +79,24 @@ public class GroupController {
 
         groupService.addUsersToGroup(savedGroup, selectedUsers);
 
-        return "redirect:/groups/my-groups";
+        return "redirect:/groups";
     }
 
-    @GetMapping("/groups/my-groups")
+//    @GetMapping("/groups")
+//    public String listUserGroups(HttpSession session, Model model) {
+//        Integer userId = (Integer) session.getAttribute("userId");
+//
+//        if (userId == null) {
+//            return "redirect:/login";
+//        }
+//
+//        List<Group> userGroups = groupService.findGroupsByUserId(userId);
+//        model.addAttribute("userGroups", userGroups);
+//
+//        return "my-groups";
+//    }
+
+    @GetMapping("/groups")
     public String listUserGroups(HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("userId");
 
@@ -80,10 +104,173 @@ public class GroupController {
             return "redirect:/login";
         }
 
-        List<Group> userGroups = groupService.findGroupsByUserId(userId);
-        model.addAttribute("userGroups", userGroups);
+        List<Group> groups = groupService.findGroupsByUserId(userId);
+        //model.addAttribute("groups", groups);
+        Map<Group, Boolean> groupsWithCreatorFlag = new HashMap<>();
+        for (Group group : groups) {
+            boolean isCreator = group.getCreatedBy().equals(userId);
+            groupsWithCreatorFlag.put(group, isCreator);
+        }
 
-        return "my-groups";
+        model.addAttribute("groupsWithCreatorFlag", groupsWithCreatorFlag);
+
+        return "groups/list";
+    }
+
+
+    @GetMapping("/groups/details/{groupId}")
+    public String getGroupDetails(@PathVariable Integer groupId, HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Group group = groupService.findById(groupId);
+        List<User> members = groupService.findMembersByGroupId(groupId);
+        List<Expense> expenses = expenseService.findByGroupId(groupId);
+
+        model.addAttribute("group", group);
+        model.addAttribute("members", members);
+        model.addAttribute("expenses", expenses);
+        model.addAttribute("isCreator", group.getCreatedBy().equals(userId));
+
+        return "groups/details";
+    }
+
+    @GetMapping("/groups/{groupId}/edit")
+    public String editGroup(@PathVariable Integer groupId, Model model) {
+        Group group = groupService.findById(groupId);
+        List<User> members = groupService.findMembersByGroupId(groupId);
+
+        model.addAttribute("group", group);
+        model.addAttribute("members", members);
+        model.addAttribute("allUsers", userService.getAllUsers());
+
+        return "groups/edit";
+    }
+
+    @PostMapping("/groups/edit")
+    public String updateGroup(
+            @RequestParam Integer groupId,
+            @RequestParam String title,
+            @RequestParam(required = false) List<Integer> usersToKick,
+            @RequestParam(required = false) String action,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            switch (action) {
+                case "rename":
+                    groupService.updateGroupTitle(groupId, title);
+                    redirectAttributes.addFlashAttribute("message", "Group renamed successfully.");
+                    break;
+                case "kick":
+                    if (usersToKick != null) {
+                        groupService.removeUsersFromGroup(groupId, usersToKick);
+                        redirectAttributes.addFlashAttribute("message", "Users removed successfully.");
+                    }
+                    break;
+                case "delete":
+                    groupService.deleteGroup(groupId);
+                    redirectAttributes.addFlashAttribute("message", "Group deleted successfully.");
+                    break;
+                default:
+                    redirectAttributes.addFlashAttribute("errorMessage", "Invalid action.");
+                    break;
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while updating the group.");
+        }
+
+        return "redirect:/groups";
+    }
+
+    @PostMapping("/groups/{groupId}/leave")
+    public String leaveGroup(
+            @PathVariable("groupId") Integer groupId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            groupService.removeUserFromGroup(groupId, userId);
+            redirectAttributes.addFlashAttribute("message", "You have left the group.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while leaving the group.");
+        }
+
+        return "redirect:/groups";
+    }
+
+
+//    @PostMapping("/groups/{groupId}/delete")
+//    public String deleteGroup(
+//            @PathVariable Integer groupId,
+//            RedirectAttributes redirectAttributes) {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        Integer currentUserId = (Integer) authentication.getPrincipal();
+//
+//        Group group = groupService.findById(groupId);
+//
+//        if (!group.getCreatedBy().equals(currentUserId)) {
+//            redirectAttributes.addFlashAttribute("errorMessage", "You are not authorized to delete this group.");
+//            return "redirect:/groups";
+//        }
+//
+//        try {
+//            groupService.deleteGroup(groupId);
+//            redirectAttributes.addFlashAttribute("successMessage", "Group deleted successfully.");
+//        } catch (Exception e) {
+//            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while deleting the group.");
+//        }
+//
+//        return "redirect:/groups";
+//    }
+
+    @PostMapping("/groups/{groupId}/delete")
+    public String deleteGroup(
+            @PathVariable Integer groupId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            Group group = groupService.findById(groupId);
+            if (group == null) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Group not found.");
+                return "redirect:/groups";
+            }
+
+            if (!group.getCreatedBy().equals((Integer) session.getAttribute("userId"))) {
+            redirectAttributes.addFlashAttribute("errorMessage", "You are not authorized to delete this group.");
+            return "redirect:/groups";
+            }
+
+            groupService.deleteGroup(groupId);
+            redirectAttributes.addFlashAttribute("successMessage", "Group deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while deleting the group.");
+            e.printStackTrace();
+        }
+
+        return "redirect:/groups";
+    }
+
+
+    @PostMapping("/{groupId}/removeUser")
+    public String removeUserFromGroup(
+            @PathVariable Integer groupId,
+            @RequestParam Integer userId,
+            RedirectAttributes redirectAttributes) {
+
+        try {
+            groupService.removeUserFromGroup(groupId, userId);
+            redirectAttributes.addFlashAttribute("successMessage", "User removed successfully.");
+        } catch (EntityNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/groups/" + groupId + "/details";
     }
 
 
