@@ -58,8 +58,8 @@ public class WebController {
         return "friends";
     }
 
-    @GetMapping("/expense")
-    public String showExpensePage() {return "expense";}
+    //@GetMapping("/expense")
+    //public String showExpensePage() {return "expense";}
 
     @GetMapping("/expensesview")
     public String showExpensesViewPage() {return "expensesview";}

@@ -7,20 +7,22 @@ public class ExpensesView {
     private LocalDateTime createdAt;
     private String title;
     private String description;
-    private BigDecimal amount;
+    private String amount; // Change from BigDecimal to String
     private String paidBy;
     private String status;
     private Long id;
+    private boolean createdByUser; // Added this field
 
-    // Constructor
-    public ExpensesView(LocalDateTime createdAt, String title, String description, BigDecimal amount, String paidBy, String status, Long id) {
+    // Updated constructor to accept createdByUser
+    public ExpensesView(LocalDateTime createdAt, String title, String description, String amount, String paidBy, String status, Long id, boolean createdByUser) {
         this.createdAt = createdAt;
         this.title = title;
         this.description = description;
-        this.amount = amount;
+        this.amount = amount; // Store amount as String for formatted value
         this.paidBy = paidBy;
         this.status = status;
         this.id = id;
+        this.createdByUser = createdByUser; // Initialize createdByUser
     }
 
     // Getters and Setters for all fields
@@ -48,11 +50,11 @@ public class ExpensesView {
         this.description = description;
     }
 
-    public BigDecimal getAmount() {
+    public String getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(String amount) {
         this.amount = amount;
     }
 
@@ -78,5 +80,14 @@ public class ExpensesView {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    // Getter and setter for createdByUser
+    public boolean isCreatedByUser() {
+        return createdByUser;
+    }
+
+    public void setCreatedByUser(boolean createdByUser) {
+        this.createdByUser = createdByUser;
     }
 }

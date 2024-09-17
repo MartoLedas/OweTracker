@@ -3,7 +3,6 @@ package com.example.owetracker.controller;
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
 import com.example.owetracker.model.ExpensesView;
-import com.example.owetracker.model.User;
 import com.example.owetracker.service.ExpenseService;
 import com.example.owetracker.service.ExpenseUserService;
 import jakarta.servlet.http.HttpSession;
@@ -30,6 +29,8 @@ public class ExpenseController {
     @Autowired
     private ExpenseUserService expenseUserService;
 
+    @Autowired
+    private HttpSession session;
 
     @GetMapping("/create")
     public String showCreateExpenseForm(Model model) {
@@ -64,7 +65,6 @@ public class ExpenseController {
         return "redirect:/expenses/list";
     }
 
-
     @PostMapping("/save")
     public String saveExpense(
             HttpSession session,
@@ -75,7 +75,7 @@ public class ExpenseController {
             @RequestParam(required = false) BigDecimal totalAmount,
             @RequestParam List<Integer> users,  // User IDs
             @RequestParam(required = false) List<BigDecimal> userAmounts  // Custom amounts per user
-            ) {
+    ) {
 
         Integer ownerId = (Integer) session.getAttribute("userId");
 
@@ -122,24 +122,31 @@ public class ExpenseController {
     }
 
 
-    @GetMapping("/list")
-    public String listExpenses(Model model) {
-        List<ExpensesView> expenses = expenseService.getAllExpenses();
-        model.addAttribute("expenses", expenses);
-        return "expensesview";
-    }
+    //@GetMapping("/list")
+    //public String listExpenses(Model model) {
+        //List<ExpensesView> expenses = expenseService.getAllExpenses();
+        //model.addAttribute("expenses", expenses);
+        //return "expensesview";
+    //}
 
     @GetMapping("/{id}")
     public Expense getExpenseById(@PathVariable Long id) {
         return expenseService.getExpenseById(id);
     }
 
-
     @DeleteMapping("/{id}")
     public void deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
     }
 
+    @GetMapping("/my-expenses")
+    public List<ExpensesView> getMyExpenses() {
+        // Retrieve the user ID from the session
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            throw new RuntimeException("User not logged in.");
+        }
+        // Pass the user ID to the service layer to get filtered expenses
+        return expenseService.getExpensesForUser(userId);
+    }
 }
-
-
