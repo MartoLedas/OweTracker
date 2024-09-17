@@ -40,6 +40,7 @@ public class WebController {
             if (user != null) {
                 System.out.println("username " + user.getUsername());
                 model.addAttribute("user", user);
+                model.addAttribute("userId", userId);
                 return "profile"; // returns profile.html page
             }
         }

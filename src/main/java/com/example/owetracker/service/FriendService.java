@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +64,16 @@ public class FriendService {
         } else {
             throw new RuntimeException("Friendship does not exist");
         }
+    }
+
+    public BigDecimal getTotalOwedByUser(Integer userId) {
+        // Query to get total money owed by user
+        return friendRepository.getTotalOwedByUser(userId);
+    }
+
+    public BigDecimal getTotalOwedToUser(Integer userId) {
+        // Query to get total money owed to user
+        return friendRepository.getTotalOwedToUser(userId);
     }
 
 
