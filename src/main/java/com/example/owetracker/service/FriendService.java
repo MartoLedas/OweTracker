@@ -26,7 +26,8 @@ public class FriendService {
     public boolean areFriends(Integer userId, Integer friendId) {
         return friendRepository.existsByUserIdAndFriendId(userId, friendId);
     }
-    public void addFriend(Integer userId, Integer friendId) {
+
+/*    public void addFriend(Integer userId, Integer friendId) {
 
         if (!friendRepository.existsByUserIdAndFriendId(userId, friendId)) {
             Friend newFriend = new Friend(userId, friendId);
@@ -34,26 +35,23 @@ public class FriendService {
         } else {
             throw new RuntimeException("Friendship already exists");
         }
-    }
+    }*/
 
 
 
     public List<User> getUserFriends(Integer userId) {
-        // Fetch all friends where the user is either the userId or the friendId
-        List<Friend> friends = friendRepository.findByUserIdOrFriendId(userId, userId);
+        List<Friend> friends = friendRepository.findByUserIdOrFriendIdAndStatus(userId, userId, "ACCEPTED");
 
-        // Initialize the list of friend IDs
         List<Integer> friendIds = new ArrayList<>();
 
-        // Populate the friend IDs
         for (Friend friend : friends) {
             int id = friend.getUserId().equals(userId) ? friend.getFriendId() : friend.getUserId();
             friendIds.add(id);
         }
 
-        // Return a list of User objects for the fetched friend IDs
         return userRepository.findAllById(friendIds);
     }
+
 
 
     public void removeFriend(Integer userId, Integer friendId) {
@@ -67,14 +65,47 @@ public class FriendService {
     }
 
     public BigDecimal getTotalOwedByUser(Integer userId) {
-        // Query to get total money owed by user
+
         return friendRepository.getTotalOwedByUser(userId);
     }
 
     public BigDecimal getTotalOwedToUser(Integer userId) {
-        // Query to get total money owed to user
+
         return friendRepository.getTotalOwedToUser(userId);
     }
 
+    public void addFriendRequest(Integer userId, Integer friendId) {
+        if (!friendRepository.existsByUserIdAndFriendId(userId, friendId)) {
+            Friend newFriend = new Friend(userId, friendId, "PENDING");
+            friendRepository.save(newFriend);
+        } else {
+            throw new RuntimeException("Friend request already sent or friendship exists");
+        }
+    }
 
+    public void acceptFriendRequest(Integer userId, Integer friendId) {
+        Friend friend = friendRepository.findByUserIdAndFriendId(friendId, userId)
+                .orElseThrow(() -> new RuntimeException("Friend request not found"));
+        friend.setStatus("ACCEPTED");
+        friendRepository.save(friend);
+    }
+
+    public void declineFriendRequest(Integer userId, Integer friendId) {
+        Friend friend = friendRepository.findByUserIdAndFriendId(friendId, userId)
+                .orElseThrow(() -> new RuntimeException("Friend request not found"));
+        friend.setStatus("DECLINED");
+        friendRepository.save(friend);
+    }
+    public List<User> getPendingFriendRequests(Integer userId) {
+        // Fetch all pending friend requests where the current user is the friendId (i.e., the recipient of the request)
+        List<Friend> pendingFriends = friendRepository.findByFriendIdAndStatus(userId, "PENDING");
+
+        List<Integer> friendIds = new ArrayList<>();
+
+        for (Friend friend : pendingFriends) {
+            friendIds.add(friend.getUserId());  // The sender of the request
+        }
+
+        return userRepository.findAllById(friendIds);
+    }
 }

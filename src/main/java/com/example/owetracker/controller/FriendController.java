@@ -50,7 +50,7 @@ public class FriendController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are already friends with this user");
             }
 
-            friendService.addFriend(userId, friendId);
+            friendService.addFriendRequest(userId, friendId);
             return ResponseEntity.ok("Friend added successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding friend: " + e.getMessage());
@@ -104,4 +104,49 @@ public class FriendController {
         }
     }
 
+    @GetMapping("/pending")
+    public List<User> getPendingFriendRequests(@RequestParam Integer userId) {
+        return friendService.getPendingFriendRequests(userId);
+    }
+    @PostMapping("/accept")
+    public ResponseEntity<String> acceptFriendRequest(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.acceptFriendRequest(userId, friendId);
+            return ResponseEntity.ok("Friend request accepted");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error accepting friend request: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/decline")
+    public ResponseEntity<String> declineFriendRequest(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.declineFriendRequest(userId, friendId);
+            return ResponseEntity.ok("Friend request declined");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error declining friend request: " + e.getMessage());
+        }
+    }
 }
