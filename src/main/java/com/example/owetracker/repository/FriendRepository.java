@@ -15,4 +15,7 @@ public interface FriendRepository extends JpaRepository<Friend, Integer> {
     @Query("SELECT f.friendId FROM Friend f WHERE f.userId = :userId")
     List<Integer> findFriendIdsByUserId(@Param("userId") Integer userId);
 
+    // Find all friends for a given user where the user is either the userId or the friendId
+    List<Friend> findByUserIdOrFriendId(Integer userId, Integer friendId);
+
 }
