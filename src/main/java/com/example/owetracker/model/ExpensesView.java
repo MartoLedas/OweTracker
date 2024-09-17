@@ -18,14 +18,13 @@ public class ExpensesView {
         this.createdAt = createdAt;
         this.title = title;
         this.description = description;
-        this.amount = amount; // Store amount as String for formatted value
+        this.amount = amount;
         this.paidBy = paidBy;
         this.status = status;
         this.id = id;
-        this.createdByUser = createdByUser; // Initialize createdByUser
+        this.createdByUser = createdByUser;
     }
 
-    // Getters and Setters for all fields
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -82,7 +81,6 @@ public class ExpensesView {
         this.id = id;
     }
 
-    // Getter and setter for createdByUser
     public boolean isCreatedByUser() {
         return createdByUser;
     }
