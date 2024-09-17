@@ -25,4 +25,6 @@ public interface GroupMembershipRepository extends JpaRepository<GroupMembership
 
     void delete(GroupMembership groupMembership);
 
+    long countByGroupId(Integer groupId);
+
 }

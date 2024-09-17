@@ -82,20 +82,6 @@ public class GroupController {
         return "redirect:/groups";
     }
 
-//    @GetMapping("/groups")
-//    public String listUserGroups(HttpSession session, Model model) {
-//        Integer userId = (Integer) session.getAttribute("userId");
-//
-//        if (userId == null) {
-//            return "redirect:/login";
-//        }
-//
-//        List<Group> userGroups = groupService.findGroupsByUserId(userId);
-//        model.addAttribute("userGroups", userGroups);
-//
-//        return "my-groups";
-//    }
-
     @GetMapping("/groups")
     public String listUserGroups(HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("userId");
@@ -201,32 +187,6 @@ public class GroupController {
 
         return "redirect:/groups";
     }
-
-
-//    @PostMapping("/groups/{groupId}/delete")
-//    public String deleteGroup(
-//            @PathVariable Integer groupId,
-//            RedirectAttributes redirectAttributes) {
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        Integer currentUserId = (Integer) authentication.getPrincipal();
-//
-//        Group group = groupService.findById(groupId);
-//
-//        if (!group.getCreatedBy().equals(currentUserId)) {
-//            redirectAttributes.addFlashAttribute("errorMessage", "You are not authorized to delete this group.");
-//            return "redirect:/groups";
-//        }
-//
-//        try {
-//            groupService.deleteGroup(groupId);
-//            redirectAttributes.addFlashAttribute("successMessage", "Group deleted successfully.");
-//        } catch (Exception e) {
-//            redirectAttributes.addFlashAttribute("errorMessage", "An error occurred while deleting the group.");
-//        }
-//
-//        return "redirect:/groups";
-//    }
 
     @PostMapping("/groups/{groupId}/delete")
     public String deleteGroup(

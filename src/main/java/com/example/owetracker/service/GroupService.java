@@ -85,6 +85,12 @@ public class GroupService {
 
         if (membership != null) {
             groupMembershipRepository.delete(membership);
+
+            long memberCount = groupMembershipRepository.countByGroupId(groupId);
+
+            if (memberCount == 0) {
+                deleteGroup(groupId);
+            }
         } else {
             throw new EntityNotFoundException("User is not part of this group.");
         }
