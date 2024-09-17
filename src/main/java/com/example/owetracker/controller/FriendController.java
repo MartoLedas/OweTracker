@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/friends")
 public class FriendController {
+
     @Autowired
     private FriendService friendService;
 
@@ -35,10 +36,17 @@ public class FriendController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You cannot add yourself as a friend");
         }
 
-        friendService.addFriend(userId, friendId);
-        return ResponseEntity.ok("Friend added successfully");
-    }
+        try {
+            if (friendService.areFriends(userId, friendId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are already friends with this user");
+            }
 
+            friendService.addFriend(userId, friendId);
+            return ResponseEntity.ok("Friend added successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding friend: " + e.getMessage());
+        }
+    }
 
     @GetMapping("/list")
     public List<User> getUserFriends(HttpSession session) {
@@ -49,5 +57,4 @@ public class FriendController {
             throw new RuntimeException("User not logged in");
         }
     }
-
 }

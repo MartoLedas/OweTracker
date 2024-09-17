@@ -16,6 +16,10 @@ public class FriendService {
 
     @Autowired
     private UserRepository userRepository;
+
+    public boolean areFriends(Integer userId, Integer friendId) {
+        return friendRepository.existsByUserIdAndFriendId(userId, friendId);
+    }
     public void addFriend(Integer userId, Integer friendId) {
 
         if (!friendRepository.existsByUserIdAndFriendId(userId, friendId)) {
