@@ -82,4 +82,26 @@ public class FriendController {
 
         return amounts;
     }
+
+    @PostMapping("/remove")
+    public ResponseEntity<String> removeFriend(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.removeFriend(userId, friendId);
+            return ResponseEntity.ok("Friend removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing friend: " + e.getMessage());
+        }
+    }
+
 }

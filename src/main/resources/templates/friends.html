@@ -96,6 +96,7 @@
                                     <p class="amount-due">${friend.totalOwedByFriend.toFixed(2)}</p>
                                     <p class="amount-owed">${friend.totalOwedToFriend.toFixed(2)}</p>
                                 </div>
+                                <button onclick="removeFriend(${friend.friendId})" class="btn btn-danger btn-sm">Remove Friend</button>
                             </div>
                         `;
 
@@ -155,6 +156,27 @@
         })
         .catch(error => {
             console.error('Error adding friend:', error);
+        });
+    }
+
+    // Function to remove a friend
+    function removeFriend(friendId) {
+        const currentUserId = parseInt(document.getElementById('currentUserId').value, 10);
+
+        fetch('/api/friends/remove', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ friendId: friendId })
+        })
+        .then(response => response.text())
+        .then(result => {
+            alert(result);
+            location.reload(); // Reload the page to update the friends list
+        })
+        .catch(error => {
+            console.error('Error removing friend:', error);
         });
     }
 </script>

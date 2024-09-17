@@ -6,10 +6,13 @@ import com.example.owetracker.repository.FriendRepository;
 import com.example.owetracker.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+
 @Service
+@Transactional
 public class FriendService {
     @Autowired
     private FriendRepository friendRepository;
@@ -39,5 +42,14 @@ public class FriendService {
         // Return a list of User objects for the fetched friend IDs
         return userRepository.findAllById(friendIds);
     }
+
+    public void removeFriend(Integer userId, Integer friendId) {
+        if (friendRepository.existsByUserIdAndFriendId(userId, friendId)) {
+            friendRepository.deleteByUserIdAndFriendId(userId, friendId);
+        } else {
+            throw new RuntimeException("Friendship does not exist");
+        }
+    }
+
 
 }

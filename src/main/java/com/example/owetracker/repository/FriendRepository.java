@@ -10,6 +10,7 @@ import java.util.List;
 @Repository
 public interface FriendRepository extends JpaRepository<Friend, Integer> {
     boolean existsByUserIdAndFriendId(Integer userId, Integer friendId);
+    void deleteByUserIdAndFriendId(Integer userId, Integer friendId);
 
     @Query("SELECT f.friendId FROM Friend f WHERE f.userId = :userId")
     List<Integer> findFriendIdsByUserId(@Param("userId") Integer userId);
