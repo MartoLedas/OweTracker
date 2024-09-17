@@ -1,0 +1,104 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expenses</title>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+    }
+    #detailDialog {
+      display: none;
+      position: absolute;
+      top: 20%;
+      left: 30%;
+      width: 40%;
+      background-color: #f9f9f9;
+      padding: 20px;
+      box-shadow: 0px 0px 10px 0px #000;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Expenses</h1>
+
+<table id="expenseTable">
+  <thead>
+  <tr>
+    <th>Date</th>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Amount</th>
+    <th>Payment From/To</th>
+    <th>Status</th>
+    <th>Details</th>
+  </tr>
+  </thead>
+  <tbody>
+  <!-- Rows will be populated by JavaScript -->
+  </tbody>
+</table>
+
+<div id="detailDialog">
+  <p id="detailContent"></p>
+  <button onclick="closeDialog()">Close</button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchExpenses();
+  });
+
+  function fetchExpenses() {
+    fetch('/api/expenses')
+            .then(response => response.json())
+            .then(data => {
+              const tableBody = document.querySelector('#expenseTable tbody');
+              tableBody.innerHTML = ''; // Clear any previous data
+              data.forEach(expense => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                        <td>${new Date(expense.createdAt).toLocaleDateString()}</td>
+                        <td>${expense.title}</td>
+                        <td>${expense.description}</td>
+                        <td>${expense.amount}</td>
+                        <td>${expense.paidBy}</td>
+                        <td>${expense.status}</td>
+                        <td><button onclick="showDetails(${expense.id})">Details</button></td>
+                    `;
+                tableBody.appendChild(row);
+              });
+            });
+  }
+
+  function showDetails(id) {
+    fetch(`/api/expenses/${id}`)
+            .then(response => response.json())
+            .then(expense => {
+              const detailDialog = document.getElementById('detailDialog');
+              const detailContent = document.getElementById('detailContent');
+              detailContent.innerHTML = `
+                    <strong>Title:</strong> ${expense.title}<br>
+                    <strong>Description:</strong> ${expense.description}<br>
+                    <strong>Amount:</strong> ${expense.amount}<br>
+                    <strong>Paid by:</strong> ${expense.paidBy}<br>
+                    <strong>Status:</strong> ${expense.status}<br>
+                    <strong>Created at:</strong> ${new Date(expense.createdAt).toLocaleString()}
+                `;
+              detailDialog.style.display = 'block';
+            });
+  }
+
+  function closeDialog() {
+    const detailDialog = document.getElementById('detailDialog');
+    detailDialog.style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

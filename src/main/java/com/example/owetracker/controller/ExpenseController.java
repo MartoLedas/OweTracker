@@ -2,6 +2,7 @@ package com.example.owetracker.controller;
 
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
+import com.example.owetracker.model.ExpensesView;
 import com.example.owetracker.model.User;
 import com.example.owetracker.service.ExpenseService;
 import com.example.owetracker.service.ExpenseUserService;
@@ -121,9 +122,11 @@ public class ExpenseController {
     }
 
 
-    @GetMapping
-    public List<Expense> getAllExpenses() {
-        return expenseService.getAllExpenses();
+    @GetMapping("/list")
+    public String listExpenses(Model model) {
+        List<ExpensesView> expenses = expenseService.getAllExpenses();
+        model.addAttribute("expenses", expenses);
+        return "expensesview";
     }
 
     @GetMapping("/{id}")
@@ -136,4 +139,7 @@ public class ExpenseController {
     public void deleteExpense(@PathVariable Long id) {
         expenseService.deleteExpense(id);
     }
+
 }
+
+

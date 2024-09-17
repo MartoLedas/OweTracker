@@ -2,6 +2,7 @@ package com.example.owetracker.service;
 
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
+import com.example.owetracker.model.ExpensesView;
 import com.example.owetracker.repository.ExpenseRepository;
 import com.example.owetracker.repository.ExpenseUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -26,6 +28,9 @@ public class ExpenseService {
 
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Transactional
     public Expense createExpense(Expense expense, List<Integer> participantIds, List<BigDecimal> amountsOwed, boolean splitEqually, BigDecimal totalAmount) {
@@ -57,9 +62,23 @@ public class ExpenseService {
         return savedExpense;
     }
 
+    //public List<Expense> getAllExpenses() {
+        //return expenseRepository.findAll();
+    //}
 
-    public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+    public List<ExpensesView> getAllExpenses() {
+        List<Expense> expenses = expenseRepository.findAll();
+
+        // Convert List<Expense> to List<ExpensesView>
+        return expenses.stream().map(expense -> new ExpensesView(
+                expense.getCreatedAt(),
+                expense.getTitle(),
+                expense.getDescription(),
+                expense.getAmount(),
+                expense.getPaidBy().getName(),  // Assuming getName() returns the name of the user
+                expense.getStatus(),
+                expense.getId()  // The expense ID for detailed lookup
+        )).collect(Collectors.toList());
     }
 
     public Expense getExpenseById(Long id) {
