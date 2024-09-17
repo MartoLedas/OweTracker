@@ -58,10 +58,11 @@ public class WebController {
     }
 
     @GetMapping("/friends")
-    public String showFriendsPage(HttpSession session) {
+    public String showFriendsPage(HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId != null) {
-            return "friends";
+            model.addAttribute("currentUserId", userId);
+            return "friends"; // Return the name of the Thymeleaf template
         }
         return "redirect:/login"; // Redirect to login if user is not logged in
     }

@@ -1,6 +1,8 @@
 package com.example.owetracker.controller;
 
+import com.example.owetracker.dto.FriendAmountDTO;
 import com.example.owetracker.model.User;
+import com.example.owetracker.service.FriendAmountService;
 import com.example.owetracker.service.FriendService;
 import com.example.owetracker.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +22,11 @@ public class FriendController {
 
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private FriendAmountService friendOwedAmountService;
+
 
     @PostMapping("/add")
     public ResponseEntity<String> addFriend(@RequestBody Map<String, Integer> payload, HttpSession session) {
@@ -56,5 +65,21 @@ public class FriendController {
         } else {
             throw new RuntimeException("User not logged in");
         }
+    }
+
+
+    @GetMapping("/amounts")
+    public List<FriendAmountDTO> getFriendAmounts(@RequestParam Integer userId) {
+        List<User> friends = friendService.getUserFriends(userId);
+        List<FriendAmountDTO> amounts = new ArrayList<>();
+
+        for (User friend : friends) {
+            BigDecimal totalOwedToFriend = friendOwedAmountService.getTotalOwedToFriend(userId, friend.getId());
+            BigDecimal totalOwedByFriend = friendOwedAmountService.getTotalOwedByFriend(userId, friend.getId());
+
+            amounts.add(new FriendAmountDTO(friend.getId(), friend.getUsername(), totalOwedToFriend, totalOwedByFriend));
+        }
+
+        return amounts;
     }
 }
