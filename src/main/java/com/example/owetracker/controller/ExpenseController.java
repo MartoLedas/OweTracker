@@ -3,8 +3,10 @@ package com.example.owetracker.controller;
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
 import com.example.owetracker.model.ExpensesView;
+import com.example.owetracker.repository.FriendRepository;
 import com.example.owetracker.service.ExpenseService;
 import com.example.owetracker.service.ExpenseUserService;
+import com.example.owetracker.service.FriendService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,11 +33,18 @@ public class ExpenseController {
 
     @Autowired
     private HttpSession session;
+    @Autowired
+    private FriendService friendService;
 
     @GetMapping("/create")
     public String showCreateExpenseForm(Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            throw new RuntimeException("User not logged in.");
+        }
+
         model.addAttribute("expense", new Expense());
-        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("friends", friendService.getUserFriends(userId));
         return "create-expense";
     }
 
