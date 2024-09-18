@@ -20,6 +20,7 @@ CREATE TABLE groups (
     id SERIAL PRIMARY KEY,
     title VARCHAR NOT NULL,
     created_by INTEGER NOT NULL,
+    status VARCHAR NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );

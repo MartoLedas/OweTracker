@@ -37,6 +37,18 @@ public class ExpenseController {
         return "create-expense";
     }
 
+//    @PostMapping("/create")
+//    public String createExpense(
+//            @ModelAttribute Expense expense,
+//            @RequestParam List<Long> participantsIds,
+//            @RequestParam List<BigDecimal> amountsOwed,
+//            Model model) {
+//
+//        expenseService.createExpense(expense, participantsIds, amountsOwed);
+//
+//        return "redirect:/expenses/list";
+//    }
+
     @PostMapping("/create")
     public String createExpense(
             @ModelAttribute Expense expense,
