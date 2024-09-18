@@ -139,7 +139,7 @@ public class ExpenseService {
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<Expense> expensesCreatedByUser = expenseRepository.findByPaidById(currentUser.getId().longValue());
+        List<Expense> expensesCreatedByUser = expenseRepository.findByPaidById(currentUser.getId());
         List<ExpenseUser> expensesWhereUserMustPay = expenseUserRepository.findByUserId(currentUser.getId().longValue());
         List<Expense> allRelevantExpenses = new ArrayList<>(expensesCreatedByUser);
         allRelevantExpenses.addAll(
@@ -176,6 +176,7 @@ public class ExpenseService {
             );
         }).collect(Collectors.toList());
     }
+
 
 
 }

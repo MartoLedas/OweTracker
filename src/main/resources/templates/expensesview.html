@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OweTracker - Manage Expenses</title>
+  <!-- Bootstrap CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <style>
+    /* Set the table width to 70% and align it to the left */
+    .table-container {
+      width: 70%;
+      margin-left: 0;
+    }
+    /* Align the Date and Amount columns to the right in the data cells, but headers remain left-aligned */
+    .text-right {
+      text-align: right;
+    }
+    /* Center the Details button */
+    .text-center {
+      text-align: center;
+    }
+    /* Ensure table headers are left aligned */
+    th {
+      text-align: left !important;
+    }
+  </style>
+</head>
+<body>
+<!-- Header with Navigation -->
+<header class="bg-light py-3 mb-4 border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="h3">OweTracker</h1>
+      <nav class="nav">
+        <a class="nav-link" href="/profile">Profile</a>
+        <a class="nav-link" href="/friends">Friends</a>
+        <a class="nav-link" href="/groups">Groups</a>
+        <a class="nav-link" href="/expenses/create">Create expense</a>
+        <form action="/api/users/logout" method="post" class="d-inline">
+          <button type="submit" class="btn btn-outline-danger">Logout</button>
+        </form>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section class="container mt-5">
+  <!-- Table title 'My Expenses' above the table -->
+  <div class="mb-3">
+    <h4 class="text-start">My Expenses</h4>
+  </div>
+
+  <div class="table-container table-responsive">
+    <table class="table table-bordered table-hover" id="expenseTable">
+      <thead class="table-light">
+      <tr>
+        <th>Date</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Amount</th>
+        <th>Payment to/from</th>
+        <th>Status</th>
+        <th class="text-center">Details</th>
+      </tr>
+      </thead>
+      <tbody>
+      <!-- Rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchExpenses();
+  });
+
+  function fetchExpenses() {
+    fetch('/api/expenses')
+            .then(response => response.json())
+            .then(data => {
+              const tableBody = document.querySelector('#expenseTable tbody');
+              tableBody.innerHTML = ''; // Clear any previous data
+
+              data.forEach(expense => {
+                const row = document.createElement('tr');
+                const amountClass = expense.createdByUser ? 'text-success' : 'text-danger';
+
+                row.innerHTML = `
+            <td class="text-right">${new Date(expense.createdAt).toLocaleDateString()}</td>
+            <td>${expense.title}</td>
+            <td>${expense.description}</td>
+            <td class="text-right"><span class="${amountClass}">${expense.amount}</span></td>
+            <td>${expense.paidBy || 'N/A'}</td>
+            <td>${expense.status}</td>
+            <td class="text-center"><button class="btn btn-primary btn-sm" onclick="showDetails(${expense.id})">Details</button></td>
+          `;
+                tableBody.appendChild(row);
+              });
+            });
+  }
+
+  function showDetails(id) {
+    fetch(`/api/expenses/${id}`)
+            .then(response => response.json())
+            .then(expense => {
+              alert(`
+          Title: ${expense.title}\n
+          Description: ${expense.description}\n
+          Amount: ${expense.amount}\n
+          Paid by: ${expense.paidBy}\n
+          Status: ${expense.status}\n
+          Created at: ${new Date(expense.createdAt).toLocaleString()}
+        `);
+            });
+  }
+</script>
+
+</body>
+</html>
