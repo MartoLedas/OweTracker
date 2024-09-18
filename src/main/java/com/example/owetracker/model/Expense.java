@@ -24,10 +24,9 @@ public class Expense {
     private User paidBy;
 
     @Column(name = "group_id")
-    private Long groupId;
+    private Integer groupId;
 
     private String status;
-
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -44,7 +43,7 @@ public class Expense {
     public Expense() {
     }
 
-    public Expense(String title, String description, BigDecimal amount, User paidBy, Long groupId, String status, LocalDateTime createdAt, List<User> participants) {
+    public Expense(String title, String description, BigDecimal amount, User paidBy, Integer groupId, String status, LocalDateTime createdAt, List<User> participants) {
         this.title = title;
         this.description = description;
         this.amount = amount;
@@ -95,21 +94,11 @@ public class Expense {
         this.paidBy = paidBy;
     }
 
-    public Long getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(Long groupId) {
-        this.groupId = groupId;
-    }
-
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public void setStatus(String status) { this.status = status; }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
