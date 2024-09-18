@@ -13,4 +13,6 @@ public interface ExpenseUserRepository extends JpaRepository<ExpenseUser, Long> 
     Optional<ExpenseUser> findByExpenseIdAndUserId(Long expenseId, Long userId);
 
     List<ExpenseUser> findByExpenseId(Long expenseId);
+
+    List<ExpenseUser> findByUserId(Long userId);
 }
