@@ -1,21 +1,17 @@
 package com.example.owetracker.controller;
 
-import com.example.owetracker.model.Expense;
-import com.example.owetracker.model.ExpenseUser;
-import com.example.owetracker.model.ExpensesView;
+import com.example.owetracker.model.*;
 import com.example.owetracker.repository.FriendRepository;
-import com.example.owetracker.service.ExpenseService;
-import com.example.owetracker.service.ExpenseUserService;
-import com.example.owetracker.service.FriendService;
+import com.example.owetracker.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.example.owetracker.service.UserService;
 import org.springframework.ui.Model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -35,6 +31,8 @@ public class ExpenseController {
     private HttpSession session;
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private GroupService groupService;
 
     @GetMapping("/create")
     public String showCreateExpenseForm(Model model) {
@@ -158,4 +156,93 @@ public class ExpenseController {
         // Pass the user ID to the service layer to get filtered expenses
         return expenseService.getExpensesForUser(userId);
     }
+
+    @GetMapping("/create-group-expense")
+    public String showCreateGroupExpenseForm(Model model) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        List<Group> userGroups = groupService.findGroupsByUserId(userId);
+
+        model.addAttribute("groups", userGroups);
+        model.addAttribute("expense", new Expense());
+
+        return "create-group-expense";
+    }
+
+    @PostMapping("/save-group-expense")
+    public String saveGroupExpense(
+            HttpSession session,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam(required = false) Boolean splitEqually,
+            @RequestParam(required = false) BigDecimal totalAmount,
+            @RequestParam Integer groupId,  // Group ID
+            @RequestParam List<Integer> memberIds,  // User IDs (members of the group)
+            @RequestParam(required = false) List<BigDecimal> memberAmounts  // Custom amounts per member
+    ) {
+
+        // Get the current logged-in user
+        Integer ownerId = (Integer) session.getAttribute("userId");
+
+        // Create the expense entity
+        Expense expense = new Expense();
+        expense.setTitle(title);
+        expense.setDescription(description);
+        expense.setPaidBy(userService.findById(ownerId));  // Logged-in user
+        expense.setStatus("pending");
+        expense.setCreatedAt(LocalDateTime.now());
+        expense.setGroupId(groupId);  // Set the group ID
+
+        // Save the expense in the database
+        Expense savedExpense = expenseService.save(expense);
+
+        BigDecimal calculatedTotalAmount = BigDecimal.ZERO;
+
+        // Handling split equally scenario
+        if (Boolean.TRUE.equals(splitEqually)) {
+            if (totalAmount == null) {
+                throw new IllegalArgumentException("Total amount is required when splitting equally");
+            }
+
+            // Calculate equal share for each member
+            BigDecimal equalAmount = totalAmount.divide(BigDecimal.valueOf(memberIds.size()), 2, BigDecimal.ROUND_HALF_UP);
+            savedExpense.setAmount(totalAmount);
+
+            // Save each member's share
+            for (Integer memberId : memberIds) {
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberId), equalAmount, "pending");
+                expenseUserService.save(expenseUser);
+            }
+        } else {
+            // Custom amounts scenario
+            if (memberAmounts == null || memberAmounts.size() != memberIds.size()) {
+                throw new IllegalArgumentException("Custom amounts must be provided for all group members");
+            }
+
+            // Calculate and assign each member's custom amount
+            for (int i = 0; i < memberIds.size(); i++) {
+                BigDecimal memberAmount = memberAmounts.get(i);
+                calculatedTotalAmount = calculatedTotalAmount.add(memberAmount);
+
+                // Save each member's specific share
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberIds.get(i)), memberAmount, "pending");
+                expenseUserService.save(expenseUser);
+            }
+
+            // Set the total calculated amount for the expense
+            savedExpense.setAmount(calculatedTotalAmount);
+            expenseService.save(savedExpense);  // Save the updated amount
+        }
+
+        return "redirect:/expensesview";  // or "redirect:/expenses" based on your flow
+    }
+
+
+
+
+
+
+
+
 }

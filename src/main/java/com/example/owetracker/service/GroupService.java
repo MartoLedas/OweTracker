@@ -130,10 +130,14 @@ public class GroupService {
         }
     }
 
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
+    }
 
+    public List<User> getGroupMembers(Integer groupId) {
+        List<Integer> userIds = groupMembershipRepository.findUserIdsByGroupId(groupId);
 
-
-
-
+        return userRepository.findAllById(userIds);
+    }
 
 }
