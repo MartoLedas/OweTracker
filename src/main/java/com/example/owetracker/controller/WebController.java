@@ -68,10 +68,9 @@ public class WebController {
         return "redirect:/login"; // Redirect to login if user is not logged in
     }
 
-    //@GetMapping("/expense")
-    //public String showExpensePage() {return "expense";}
-
-    @GetMapping("/expensesview")
-    public String showExpensesViewPage() {return "expensesview";}
-
+    @GetMapping("/expense")
+    public String showExpenseForm(Model model) {
+        model.addAttribute("message", "");
+        return "expense"; // returns html page
+    }
 }
