@@ -2,6 +2,7 @@ package com.example.owetracker.service;
 
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
+import com.example.owetracker.model.ExpensesView;
 import com.example.owetracker.repository.ExpenseRepository;
 import com.example.owetracker.repository.ExpenseUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Service;
 import com.example.owetracker.model.User;
 import com.example.owetracker.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,6 +30,7 @@ public class ExpenseService {
 
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
+
 
     @Transactional
     public Expense createExpense(Expense expense, List<Integer> participantIds, List<BigDecimal> amountsOwed, boolean splitEqually, BigDecimal totalAmount) {
@@ -129,5 +134,48 @@ public class ExpenseService {
     public List<Expense> findByGroupId(Integer groupId) {
         return expenseRepository.findByGroupId(groupId);
     }
+
+    public List<ExpensesView> getExpensesForUser(Integer userId) {
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Expense> expensesCreatedByUser = expenseRepository.findByPaidById(currentUser.getId().longValue());
+        List<ExpenseUser> expensesWhereUserMustPay = expenseUserRepository.findByUserId(currentUser.getId().longValue());
+        List<Expense> allRelevantExpenses = new ArrayList<>(expensesCreatedByUser);
+        allRelevantExpenses.addAll(
+                expensesWhereUserMustPay.stream()
+                        .map(ExpenseUser::getExpense)  // Convert ExpenseUser to Expense
+                        .collect(Collectors.toList())
+        );
+
+        allRelevantExpenses.sort(Comparator.comparing(Expense::getCreatedAt).reversed());
+        return allRelevantExpenses.stream().map(expense -> {
+            String paymentFromTo = "N/A";
+            boolean createdByUser = expense.getPaidBy().equals(currentUser);
+            String formattedAmount;
+
+            if (createdByUser) {
+                formattedAmount = "+" + expense.getAmount().toString();
+                List<ExpenseUser> participants = expenseUserRepository.findByExpenseId(expense.getId());
+                if (!participants.isEmpty()) {
+                    paymentFromTo = participants.get(0).getUser().getName();  // Get the first participant's name
+                }
+            } else {
+                formattedAmount = "-" + expense.getAmount().toString();
+                paymentFromTo = expense.getPaidBy().getName();
+            }
+            return new ExpensesView(
+                    expense.getCreatedAt(),
+                    expense.getTitle(),
+                    expense.getDescription(),
+                    formattedAmount,
+                    paymentFromTo,
+                    expense.getStatus(),
+                    expense.getId(),
+                    createdByUser
+            );
+        }).collect(Collectors.toList());
+    }
+
 
 }
