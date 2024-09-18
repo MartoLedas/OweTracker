@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,8 @@ public class UserService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private FriendService friendService;
 
     public Optional<User> getUserById(Integer id) {
         return userRepository.findById(id);
@@ -88,6 +91,29 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+
+
+    public boolean hasPendingTransactions(Integer userId) {
+        // Fetch the amounts
+        BigDecimal totalOwedByUser = friendService.getTotalOwedByUser(userId);
+        BigDecimal totalOwedToUser = friendService.getTotalOwedToUser(userId);
+
+        // Define a constant for zero
+        BigDecimal zero = BigDecimal.ZERO;
+
+        // Check if the user owes money or is owed money
+        boolean owesMoney = totalOwedByUser != null && totalOwedByUser.compareTo(zero) > 0;
+        boolean isOwedMoney = totalOwedToUser != null && totalOwedToUser.compareTo(zero) > 0;
+
+        return owesMoney || isOwedMoney;
+    }
+
+    public void deleteUser(Integer userId) {
+        // Perform deletion logic
+        userRepository.deleteById(userId);
+    }
+
 
 
 

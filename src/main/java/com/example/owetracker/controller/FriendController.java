@@ -1,6 +1,8 @@
 package com.example.owetracker.controller;
 
+import com.example.owetracker.dto.FriendAmountDTO;
 import com.example.owetracker.model.User;
+import com.example.owetracker.service.FriendAmountService;
 import com.example.owetracker.service.FriendService;
 import com.example.owetracker.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -9,26 +11,49 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/friends")
 public class FriendController {
+
     @Autowired
     private FriendService friendService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private FriendAmountService friendOwedAmountService;
+
 
     @PostMapping("/add")
     public ResponseEntity<String> addFriend(@RequestBody Map<String, Integer> payload, HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");  // Get logged-in user's ID from session
         Integer friendId = payload.get("friendId");  // Get friend's ID from request body
 
-        if (userId != null && friendId != null) {
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
 
-            friendService.addFriend(userId, friendId);
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        if (userId.equals(friendId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You cannot add yourself as a friend");
+        }
+
+        try {
+            if (friendService.areFriends(userId, friendId)) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You are already friends with this user");
+            }
+
+            friendService.addFriendRequest(userId, friendId);
             return ResponseEntity.ok("Friend added successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID or user not logged in");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding friend: " + e.getMessage());
         }
     }
 
@@ -42,4 +67,86 @@ public class FriendController {
         }
     }
 
+
+    @GetMapping("/amounts")
+    public List<FriendAmountDTO> getFriendAmounts(@RequestParam Integer userId) {
+        List<User> friends = friendService.getUserFriends(userId);
+        List<FriendAmountDTO> amounts = new ArrayList<>();
+
+        for (User friend : friends) {
+            BigDecimal totalOwedToFriend = friendOwedAmountService.getTotalOwedToFriend(userId, friend.getId());
+            BigDecimal totalOwedByFriend = friendOwedAmountService.getTotalOwedByFriend(userId, friend.getId());
+
+            amounts.add(new FriendAmountDTO(friend.getId(), friend.getUsername(), totalOwedToFriend, totalOwedByFriend));
+        }
+
+        return amounts;
+    }
+
+    @PostMapping("/remove")
+    public ResponseEntity<String> removeFriend(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.removeFriend(userId, friendId);
+            return ResponseEntity.ok("Friend removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing friend: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/pending")
+    public List<User> getPendingFriendRequests(@RequestParam Integer userId) {
+        return friendService.getPendingFriendRequests(userId);
+    }
+    @PostMapping("/accept")
+    public ResponseEntity<String> acceptFriendRequest(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.acceptFriendRequest(userId, friendId);
+            return ResponseEntity.ok("Friend request accepted");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error accepting friend request: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/decline")
+    public ResponseEntity<String> declineFriendRequest(@RequestBody Map<String, Integer> payload, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        Integer friendId = payload.get("friendId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not logged in");
+        }
+
+        if (friendId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid friend ID");
+        }
+
+        try {
+            friendService.declineFriendRequest(userId, friendId);
+            return ResponseEntity.ok("Friend request declined");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error declining friend request: " + e.getMessage());
+        }
+    }
 }

@@ -2,7 +2,6 @@ package com.example.owetracker.service;
 
 import com.example.owetracker.model.Expense;
 import com.example.owetracker.model.ExpenseUser;
-import com.example.owetracker.model.ExpensesView;
 import com.example.owetracker.repository.ExpenseRepository;
 import com.example.owetracker.repository.ExpenseUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,6 @@ import org.springframework.stereotype.Service;
 import com.example.owetracker.model.User;
 import com.example.owetracker.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
-import java.util.Comparator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -30,7 +26,6 @@ public class ExpenseService {
 
     @Autowired
     private ExpenseUserRepository expenseUserRepository;
-
 
     @Transactional
     public Expense createExpense(Expense expense, List<Integer> participantIds, List<BigDecimal> amountsOwed, boolean splitEqually, BigDecimal totalAmount) {
@@ -76,6 +71,23 @@ public class ExpenseService {
         return expenseRepository.save(expense);
     }
 
+    public Expense updateExpense(Long id, Expense updatedExpense) {
+        Optional<Expense> existingExpense = expenseRepository.findById(id);
+
+        if (existingExpense.isPresent()) {
+            Expense expense = existingExpense.get();
+            expense.setTitle(updatedExpense.getTitle());
+            expense.setDescription(updatedExpense.getDescription());
+            expense.setAmount(updatedExpense.getAmount());
+            expense.setPaidBy(updatedExpense.getPaidBy());
+            expense.setGroupId(updatedExpense.getGroupId());
+            expense.setStatus(updatedExpense.getStatus());
+            return expenseRepository.save(expense);
+        } else {
+            return null;
+        }
+    }
+
     public void deleteExpense(Long id) {
         if (expenseRepository.existsById(id)) {
             expenseRepository.deleteById(id);
@@ -119,11 +131,11 @@ public class ExpenseService {
     }
 
 
-    public List<Expense> getExpensesByGroupId(Integer groupId) {
+    public List<Expense> getExpensesByGroupId(Long groupId) {
         return expenseRepository.findByGroupId(groupId);
     }
 
-    public List<Expense> getExpensesPaidByUser(Integer userId) {
+    public List<Expense> getExpensesPaidByUser(Long userId) {
         return expenseRepository.findByPaidById(userId);
     }
 
@@ -176,7 +188,5 @@ public class ExpenseService {
             );
         }).collect(Collectors.toList());
     }
-
-
 
 }

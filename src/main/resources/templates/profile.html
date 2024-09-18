@@ -74,15 +74,21 @@
 
                 <!-- Display message -->
                 <p id="message" class="mt-3 text-center text-danger"></p>
+
+                <!-- Delete Account Button -->
+                <button id="deleteAccountButton" class="btn btn-danger btn-block mt-4">Delete Account</button>
+
+                <!-- Hidden field for user ID -->
+                <input type="hidden" id="userId" th:value="${user.id}">
             </div>
         </div>
     </div>
 </main>
 
 <!-- Bootstrap JS, Popper.js, and jQuery -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Updated to jQuery 3.6.0 -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script> <!-- Updated to match Bootstrap 5 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> <!-- Updated to match Bootstrap 5 -->
 
 <script>
     document.getElementById('editProfileForm').addEventListener('submit', function(event) {
@@ -137,6 +143,38 @@
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('message').innerText = 'Profile update failed. Please try again.';
+        });
+    });
+
+    document.getElementById('deleteAccountButton').addEventListener('click', function() {
+        const userId = document.getElementById('userId').value;
+
+        if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            return;
+        }
+
+        fetch(`/api/users/delete?userId=${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to delete account');
+            }
+            return response.text();
+        })
+        .then(result => {
+            document.getElementById('message').innerText = result;
+            // Redirect to login or homepage after successful deletion
+            setTimeout(() => {
+                window.location.href = '/login'; // Redirect to login or homepage
+            }, 2000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('message').innerText = 'Account deletion failed. Please try again.';
         });
     });
 </script>
