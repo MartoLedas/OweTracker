@@ -142,4 +142,51 @@ public class ExpenseService {
     public List<Expense> getExpensesByStatus(String status) {
         return expenseRepository.findByStatus(status);
     }
+
+    public List<Expense> findByGroupId(Integer groupId) {
+        return expenseRepository.findByGroupId(groupId);
+    }
+
+    public List<ExpensesView> getExpensesForUser(Integer userId) {
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Expense> expensesCreatedByUser = expenseRepository.findByPaidById(currentUser.getId());
+        List<ExpenseUser> expensesWhereUserMustPay = expenseUserRepository.findByUserId(currentUser.getId().longValue());
+        List<Expense> allRelevantExpenses = new ArrayList<>(expensesCreatedByUser);
+        allRelevantExpenses.addAll(
+                expensesWhereUserMustPay.stream()
+                        .map(ExpenseUser::getExpense)  // Convert ExpenseUser to Expense
+                        .collect(Collectors.toList())
+        );
+
+        allRelevantExpenses.sort(Comparator.comparing(Expense::getCreatedAt).reversed());
+        return allRelevantExpenses.stream().map(expense -> {
+            String paymentFromTo = "N/A";
+            boolean createdByUser = expense.getPaidBy().equals(currentUser);
+            String formattedAmount;
+
+            if (createdByUser) {
+                formattedAmount = "+" + expense.getAmount().toString();
+                List<ExpenseUser> participants = expenseUserRepository.findByExpenseId(expense.getId());
+                if (!participants.isEmpty()) {
+                    paymentFromTo = participants.get(0).getUser().getName();  // Get the first participant's name
+                }
+            } else {
+                formattedAmount = "-" + expense.getAmount().toString();
+                paymentFromTo = expense.getPaidBy().getName();
+            }
+            return new ExpensesView(
+                    expense.getCreatedAt(),
+                    expense.getTitle(),
+                    expense.getDescription(),
+                    formattedAmount,
+                    paymentFromTo,
+                    expense.getStatus(),
+                    expense.getId(),
+                    createdByUser
+            );
+        }).collect(Collectors.toList());
+    }
+
 }
