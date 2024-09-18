@@ -125,16 +125,8 @@ public class ExpenseController {
             expenseService.save(savedExpense);
         }
 
-        return "redirect:/home"; //change to "redirect:/expenses" later or create success message page
+        return "redirect:/expensesview"; //could be changed to success message later (optional)
     }
-
-
-    //@GetMapping("/list")
-    //public String listExpenses(Model model) {
-        //List<ExpensesView> expenses = expenseService.getAllExpenses();
-        //model.addAttribute("expenses", expenses);
-        //return "expensesview";
-    //}
 
     @GetMapping("/{id}")
     public Expense getExpenseById(@PathVariable Long id) {
@@ -177,65 +169,55 @@ public class ExpenseController {
             @RequestParam String description,
             @RequestParam(required = false) Boolean splitEqually,
             @RequestParam(required = false) BigDecimal totalAmount,
-            @RequestParam Integer groupId,  // Group ID
-            @RequestParam List<Integer> memberIds,  // User IDs (members of the group)
-            @RequestParam(required = false) List<BigDecimal> memberAmounts  // Custom amounts per member
+            @RequestParam Integer groupId,
+            @RequestParam List<Integer> memberIds,
+            @RequestParam(required = false) List<BigDecimal> memberAmounts
     ) {
 
-        // Get the current logged-in user
         Integer ownerId = (Integer) session.getAttribute("userId");
 
-        // Create the expense entity
         Expense expense = new Expense();
         expense.setTitle(title);
         expense.setDescription(description);
-        expense.setPaidBy(userService.findById(ownerId));  // Logged-in user
+        expense.setPaidBy(userService.findById(ownerId));
         expense.setStatus("pending");
         expense.setCreatedAt(LocalDateTime.now());
-        expense.setGroupId(groupId);  // Set the group ID
+        expense.setGroupId(groupId);
 
-        // Save the expense in the database
         Expense savedExpense = expenseService.save(expense);
 
         BigDecimal calculatedTotalAmount = BigDecimal.ZERO;
 
-        // Handling split equally scenario
         if (Boolean.TRUE.equals(splitEqually)) {
             if (totalAmount == null) {
                 throw new IllegalArgumentException("Total amount is required when splitting equally");
             }
 
-            // Calculate equal share for each member
             BigDecimal equalAmount = totalAmount.divide(BigDecimal.valueOf(memberIds.size()), 2, BigDecimal.ROUND_HALF_UP);
             savedExpense.setAmount(totalAmount);
 
-            // Save each member's share
             for (Integer memberId : memberIds) {
                 ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberId), equalAmount, "pending");
                 expenseUserService.save(expenseUser);
             }
         } else {
-            // Custom amounts scenario
             if (memberAmounts == null || memberAmounts.size() != memberIds.size()) {
                 throw new IllegalArgumentException("Custom amounts must be provided for all group members");
             }
 
-            // Calculate and assign each member's custom amount
             for (int i = 0; i < memberIds.size(); i++) {
                 BigDecimal memberAmount = memberAmounts.get(i);
                 calculatedTotalAmount = calculatedTotalAmount.add(memberAmount);
 
-                // Save each member's specific share
                 ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberIds.get(i)), memberAmount, "pending");
                 expenseUserService.save(expenseUser);
             }
 
-            // Set the total calculated amount for the expense
             savedExpense.setAmount(calculatedTotalAmount);
-            expenseService.save(savedExpense);  // Save the updated amount
+            expenseService.save(savedExpense);
         }
 
-        return "redirect:/expensesview";  // or "redirect:/expenses" based on your flow
+        return "redirect:/expensesview";
     }
 
 
