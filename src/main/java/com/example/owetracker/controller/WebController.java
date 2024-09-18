@@ -40,6 +40,7 @@ public class WebController {
             if (user != null) {
                 System.out.println("username " + user.getUsername());
                 model.addAttribute("user", user);
+                model.addAttribute("userId", userId);
                 return "profile"; // returns profile.html page
             }
         }
@@ -49,19 +50,27 @@ public class WebController {
 
 
     @GetMapping("/home")
-    public String showHomePage() {
-        return "home"; // This should return home.html from src/main/resources/templates/
+    public String showHomePage(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null) {
+            return "home";
+        }
+        return "redirect:/login"; // Redirect to login if user is not logged in
     }
 
     @GetMapping("/friends")
-    public String showFriendsPage() {
-        return "friends";
+    public String showFriendsPage(HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null) {
+            model.addAttribute("currentUserId", userId);
+            return "friends"; // Return the name of the Thymeleaf template
+        }
+        return "redirect:/login"; // Redirect to login if user is not logged in
     }
 
-    //@GetMapping("/expense")
-    //public String showExpensePage() {return "expense";}
-
-    @GetMapping("/expensesview")
-    public String showExpensesViewPage() {return "expensesview";}
-
+    @GetMapping("/expense")
+    public String showExpenseForm(Model model) {
+        model.addAttribute("message", "");
+        return "expense"; // returns html page
+    }
 }
