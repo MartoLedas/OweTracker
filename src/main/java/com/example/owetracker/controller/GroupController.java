@@ -104,7 +104,7 @@ public class GroupController {
         Integer userId = (Integer) session.getAttribute("userId");
         Group group = groupService.findById(groupId);
         List<User> members = groupService.findMembersByGroupId(groupId);
-        List<Expense> expenses = expenseService.findByGroupId(groupId);
+        List<Expense> expenses = expenseService.getExpensesByGroupId(groupId); // Correct method name here
 
         model.addAttribute("group", group);
         model.addAttribute("members", members);
