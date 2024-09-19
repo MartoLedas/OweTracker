@@ -8,22 +8,108 @@
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
+        body {
+            background-color: #002b36;
+        }
+        .text-color-custom {
+            color: #a5bcbe;
+        }
+        .btn-primary {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #b58900;
+            --bs-btn-border-color: #b58900;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #9a7400;
+            --bs-btn-hover-border-color: #916e00;
+            --bs-btn-focus-shadow-rgb: 192, 155, 38;
+        }
+        .btn-secondary {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #2aa198;
+            --bs-btn-border-color: #2aa198;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #248981;
+            --bs-btn-hover-border-color: #22817a;
+            --bs-btn-focus-shadow-rgb: 74, 175, 167;
+        }
+        .btn-danger {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #dc3545;
+            --bs-btn-border-color: #dc3545;
+        }
+        .btn-success {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #2aa198;
+            --bs-btn-border-color: #2aa198;
+            --bs-btn-hover-bg: #248981;
+        }
+        .form-control {
+            color: #073642;
+            background-color: #adb5bd;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            background-color: #002228;
+            color: #a5bcbe;
+        }
+        .card-body, .table {
+            background-color: #002b36;
+            color: white;
+        }
         .amount-owed {
-            color: green; /* Color for owed amounts */
+            color: #2aa198;
         }
         .amount-due {
-            color: red; /* Color for amounts due */
+            color: #dc3545;
         }
         .friend-details {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 10px; /* Add some spacing */
+            margin-bottom: 10px;
         }
         .friend-amounts {
             display: flex;
-            gap: 10px; /* Space between amounts */
+            gap: 10px;
         }
+        .table {
+            --bs-table-color-type: initial;
+            --bs-table-bg-type: initial;
+            --bs-table-color-state: initial;
+            --bs-table-bg-state: initial;
+            --bs-table-color: #fff;
+            --bs-table-bg: #002b36;
+            --bs-table-border-color: #073642;
+            --bs-table-accent-bg: rgba(255, 255, 255, 0.05);
+            --bs-table-striped-color: #fff;
+            --bs-table-striped-bg: rgba(19,64,75, 0.05);
+            --bs-table-active-color: #fff;
+            --bs-table-active-bg: rgba(255, 255, 255, 0.1);
+            --bs-table-hover-color: #fff;
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+            width: 100%;
+            margin-bottom: 1rem;
+            vertical-align: top;
+            border-color: #ffff;
+        }
+        table td:last-child, table th:last-child {
+            width: 1%; /* Restrict width of the 'Remove' column */
+            white-space: nowrap;
+        }
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            text-decoration: none;
+            background-color: transparent;
+            border: 1px solid #073642;
+        }
+
+        .list-group-item:hover {
+            background-color: #085468;
+        }
+
     </style>
 </head>
 <body>
@@ -34,7 +120,7 @@
 <header class="bg-light py-3 mb-4 border-bottom">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h3">OweTracker</h1>
+            <h1 class="h3 text-color-custom">OweTracker</h1>
             <nav class="nav">
                 <a class="nav-link" href="/profile">Profile</a>
                 <form action="/api/users/logout" method="post" class="d-inline">
@@ -49,34 +135,34 @@
 <main class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <h1 class="text-center">Search Friends</h1>
+            <h1 class="text-center text-color-custom">Search Friends</h1>
 
             <!-- Form for searching users -->
             <form id="searchForm" class="form-inline mb-4 justify-content-center">
-                <label class="sr-only" for="search">Search for users</label>
+                <label class="sr-only text-color-custom" for="search">Search for users</label>
                 <input type="text" class="form-control mb-2 mr-sm-2" id="search" name="search" placeholder="Enter username" required>
                 <button type="submit" class="btn btn-primary mb-2">Search</button>
             </form>
 
             <!-- Section to display the search results -->
-            <div id="results" class="mb-5"></div>
+            <div id="results" class="mb-5 text-color-custom"></div>
 
             <!-- Section to display current friends and amount details -->
-            <h2 class="text-center">Your Friends</h2>
+            <h2 class="text-center text-color-custom">Your Friends</h2>
             <!-- Table to display friends -->
-            <table class="table table-striped">
+            <table class="table table">
                 <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>You Owe</th>
-                    <th>Owes You</th>
-                    <th>Remove</th>
+                    <th class="text-color-custom">Name</th>
+                    <th class="text-color-custom">You Owe</th>
+                    <th class="text-color-custom">Owes You</th>
+                    <th class="text-color-custom">Remove</th>
                 </tr>
                 </thead>
-                <tbody id="friendsTableBody"></tbody> <!-- Table body for friends list -->
+                <tbody id="friendsTableBody"></tbody>
             </table>
 
-            <h2 class="text-center">Pending Friend Requests</h2>
+            <h2 class="text-center text-color-custom">Pending Friend Requests</h2>
             <div id="pendingRequestsList" class="list-group"></div>
         </div>
     </div>

@@ -179,7 +179,7 @@
           <form th:if="${member.id != creatorId}" th:action="@{/groups/edit}" method="post" style="display:inline;">
             <input type="hidden" name="groupId" th:value="${group.id}" />
             <input type="hidden" name="usersToKick" th:value="${member.id}" />
-            <button type="submit" name="action" value="kick" class="btn btn-warning btn-sm">Kick</button>
+            <button type="submit" name="action" value="kick" class="btn btn-warning btn-sm">Remove</button>
           </form>
         </div>
       </li>
