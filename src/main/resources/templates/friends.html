@@ -63,7 +63,18 @@
 
             <!-- Section to display current friends and amount details -->
             <h2 class="text-center">Your Friends</h2>
-            <div id="friendsList" class="list-group"></div>
+            <!-- Table to display friends -->
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>You Owe</th>
+                    <th>Owes You</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+                <tbody id="friendsTableBody"></tbody> <!-- Table body for friends list -->
+            </table>
 
             <h2 class="text-center">Pending Friend Requests</h2>
             <div id="pendingRequestsList" class="list-group"></div>
@@ -84,26 +95,19 @@
         fetch(`/api/friends/amounts?userId=${currentUserId}`)
             .then(response => response.json())
             .then(friends => {
-                const friendsList = document.getElementById('friendsList');
+                const friendsTableBody = document.getElementById('friendsTableBody');
                 if (friends.length === 0) {
-                    friendsList.innerHTML = '<p>You have no friends yet.</p>';
+                    friendsTableBody.innerHTML = '<tr><td colspan="4">You have no friends yet.</td></tr>';
                 } else {
                     friends.forEach(friend => {
-                        const friendDiv = document.createElement('div');
-                        friendDiv.classList.add('list-group-item');
-
-                        friendDiv.innerHTML = `
-                            <div class="friend-details">
-                                <h5>${friend.friendUsername}</h5>
-                                <div class="friend-amounts">
-                                    <p class="amount-due">${friend.totalOwedByFriend.toFixed(2)}</p>
-                                    <p class="amount-owed">${friend.totalOwedToFriend.toFixed(2)}</p>
-                                </div>
-                                <button onclick="removeFriend(${friend.friendId})" class="btn btn-danger btn-sm">Remove Friend</button>
-                            </div>
+                        const friendRow = document.createElement('tr');
+                        friendRow.innerHTML = `
+                            <td>${friend.friendUsername}</td>
+                            <td class="amount-due">${friend.totalOwedByFriend.toFixed(2)} €</td>
+                            <td class="amount-owed">${friend.totalOwedToFriend.toFixed(2)} €</td>
+                            <td><button onclick="removeFriend(${friend.friendId})" class="btn btn-danger btn-sm">Remove</button></td>
                         `;
-
-                        friendsList.appendChild(friendDiv);
+                        friendsTableBody.appendChild(friendRow);
                     });
                 }
             })
