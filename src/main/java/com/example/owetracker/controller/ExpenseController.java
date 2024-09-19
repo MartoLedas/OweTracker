@@ -8,6 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import com.example.owetracker.model.Expense;
+import com.example.owetracker.model.ExpenseUser;
+import com.example.owetracker.model.ExpensesView;
+import com.example.owetracker.service.*;
+import com.example.owetracker.service.ExpenseService;
+import com.example.owetracker.service.ExpenseUserService;
+import com.example.owetracker.service.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
