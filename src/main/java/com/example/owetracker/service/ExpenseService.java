@@ -193,4 +193,18 @@ public class ExpenseService {
         }).collect(Collectors.toList());
     }
 
+    public void updateExpenseStatus(Long expenseId, String newStatus) {
+        // Update the status in the 'expenses' table
+        Expense expense = expenseRepository.findById(expenseId).orElseThrow(() -> new RuntimeException("Expense not found"));
+        expense.setStatus(newStatus);
+        expenseRepository.save(expense);
+
+        // Update the status in the 'expense_users' table for the same expense
+        List<ExpenseUser> expenseUsers = expenseUserRepository.findByExpenseId(expenseId);
+        for (ExpenseUser expenseUser : expenseUsers) {
+            expenseUser.setStatus(newStatus);  // Assuming you want to set the same status for each user
+            expenseUserRepository.save(expenseUser);
+        }
+    }
+
 }
