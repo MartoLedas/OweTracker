@@ -29,17 +29,13 @@ public class ExpenseRestController {
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateExpenseStatus(@PathVariable Long id, @RequestBody Map<String, String> updates) {
         String newStatus = updates.get("status");
-        Expense expense = expenseService.getExpenseById(id);
 
-        if (expense == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Expense not found");
+        try {
+            expenseService.updateExpenseStatus(id, newStatus);  // Use the updated service method
+            return ResponseEntity.ok("Status updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update status");
         }
-
-        // Set new status and save to DB
-        expense.setStatus(newStatus);
-        expenseService.save(expense);  // Save updated expense to DB
-
-        return ResponseEntity.ok(expense);  // Return updated expense
     }
 
 
