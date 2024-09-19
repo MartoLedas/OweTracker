@@ -1,19 +1,24 @@
 package com.example.owetracker.controller;
 
-import com.example.owetracker.model.Expense;
-import com.example.owetracker.model.ExpenseUser;
-import com.example.owetracker.model.ExpensesView;
-import com.example.owetracker.service.ExpenseService;
-import com.example.owetracker.service.ExpenseUserService;
+import com.example.owetracker.model.*;
+import com.example.owetracker.repository.FriendRepository;
+import com.example.owetracker.service.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import com.example.owetracker.service.UserService;
 import org.springframework.ui.Model;
+import com.example.owetracker.model.Expense;
+import com.example.owetracker.model.ExpenseUser;
+import com.example.owetracker.model.ExpensesView;
+import com.example.owetracker.service.*;
+import com.example.owetracker.service.ExpenseService;
+import com.example.owetracker.service.ExpenseUserService;
+import com.example.owetracker.service.UserService;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,11 +36,20 @@ public class ExpenseController {
 
     @Autowired
     private HttpSession session;
+    @Autowired
+    private FriendService friendService;
+    @Autowired
+    private GroupService groupService;
 
     @GetMapping("/create")
     public String showCreateExpenseForm(Model model) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId == null) {
+            throw new RuntimeException("User not logged in.");
+        }
+
         model.addAttribute("expense", new Expense());
-        model.addAttribute("allUsers", userService.getAllUsers());
+        model.addAttribute("friends", friendService.getUserFriends(userId));
         return "create-expense";
     }
 
@@ -118,16 +132,8 @@ public class ExpenseController {
             expenseService.save(savedExpense);
         }
 
-        return "redirect:/home"; //change to "redirect:/expenses" later or create success message page
+        return "redirect:/expensesview"; //could be changed to success message later (optional)
     }
-
-
-    //@GetMapping("/list")
-    //public String listExpenses(Model model) {
-        //List<ExpensesView> expenses = expenseService.getAllExpenses();
-        //model.addAttribute("expenses", expenses);
-        //return "expensesview";
-    //}
 
     @GetMapping("/{id}")
     public Expense getExpenseById(@PathVariable Long id) {
@@ -149,4 +155,83 @@ public class ExpenseController {
         // Pass the user ID to the service layer to get filtered expenses
         return expenseService.getExpensesForUser(userId);
     }
+
+    @GetMapping("/create-group-expense")
+    public String showCreateGroupExpenseForm(Model model) {
+
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        List<Group> userGroups = groupService.findGroupsByUserId(userId);
+
+        model.addAttribute("groups", userGroups);
+        model.addAttribute("expense", new Expense());
+
+        return "create-group-expense";
+    }
+
+    @PostMapping("/save-group-expense")
+    public String saveGroupExpense(
+            HttpSession session,
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam(required = false) Boolean splitEqually,
+            @RequestParam(required = false) BigDecimal totalAmount,
+            @RequestParam Integer groupId,
+            @RequestParam List<Integer> memberIds,
+            @RequestParam(required = false) List<BigDecimal> memberAmounts
+    ) {
+
+        Integer ownerId = (Integer) session.getAttribute("userId");
+
+        Expense expense = new Expense();
+        expense.setTitle(title);
+        expense.setDescription(description);
+        expense.setPaidBy(userService.findById(ownerId));
+        expense.setStatus("pending");
+        expense.setCreatedAt(LocalDateTime.now());
+        expense.setGroupId(groupId);
+
+        Expense savedExpense = expenseService.save(expense);
+
+        BigDecimal calculatedTotalAmount = BigDecimal.ZERO;
+
+        if (Boolean.TRUE.equals(splitEqually)) {
+            if (totalAmount == null) {
+                throw new IllegalArgumentException("Total amount is required when splitting equally");
+            }
+
+            BigDecimal equalAmount = totalAmount.divide(BigDecimal.valueOf(memberIds.size()), 2, BigDecimal.ROUND_HALF_UP);
+            savedExpense.setAmount(totalAmount);
+
+            for (Integer memberId : memberIds) {
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberId), equalAmount, "pending");
+                expenseUserService.save(expenseUser);
+            }
+        } else {
+            if (memberAmounts == null || memberAmounts.size() != memberIds.size()) {
+                throw new IllegalArgumentException("Custom amounts must be provided for all group members");
+            }
+
+            for (int i = 0; i < memberIds.size(); i++) {
+                BigDecimal memberAmount = memberAmounts.get(i);
+                calculatedTotalAmount = calculatedTotalAmount.add(memberAmount);
+
+                ExpenseUser expenseUser = new ExpenseUser(savedExpense, userService.findById(memberIds.get(i)), memberAmount, "pending");
+                expenseUserService.save(expenseUser);
+            }
+
+            savedExpense.setAmount(calculatedTotalAmount);
+            expenseService.save(savedExpense);
+        }
+
+        return "redirect:/expensesview";
+    }
+
+
+
+
+
+
+
+
 }
