@@ -87,4 +87,4 @@ public class ExpenseRestController {
         expenseService.deleteExpense(id);
         return ResponseEntity.ok("Expense deleted successfully");
     }
-}
+}  

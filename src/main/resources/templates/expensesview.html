@@ -142,7 +142,7 @@
            <td class="text-right">${new Date(expense.createdAt).toLocaleDateString()}</td>
            <td>${expense.title}</td>
            <td>${expense.description}</td>
-           <td class="text-right"><span class="${amountClass}">${expense.amount}</span></td>
+           <td class="text-right"><span class="${amountClass}">${expense.amount} €</span></td>
            <td>${expense.paidBy || 'N/A'}</td>
            <td>${expense.status}</td>
            <td class="edit-btn-container">${editButtonHtml}</td>
