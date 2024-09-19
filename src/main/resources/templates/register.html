@@ -94,8 +94,12 @@
                             <label for="password" class="text-color-custom">Password:</label>
                             <input type="password" class="form-control" id="password" name="password" required minlength="6"
                                    pattern="(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}" placeholder="Enter password">
-                            <small class="form-text text-muted">Password must be at least 6 characters long and contain both letters and numbers.</small>
                         </div>
+                        <div class="form-group mb-3">
+                            <label for="confirmPassword" class="text-color-custom">Repeat Password:</label>
+                            <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required placeholder="Repeat password">
+                        </div>
+                        <p>Password must be at least 6 characters long and contain both letters and numbers.</p>
                         <button type="submit" class="btn btn-primary btn-block w-100">Register</button>
                     </form>
                     <p id="message" class="text-danger"></p>
@@ -127,6 +131,10 @@
         }
         if (password.length < 6 || !/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
             document.getElementById('message').innerText = 'Password must be at least 6 characters long and contain both letters and numbers.';
+            return;
+        }
+        if (password !== confirmPassword) {
+            document.getElementById('message').innerText = 'Passwords do not match.';
             return;
         }
 
