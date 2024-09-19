@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,53 +7,86 @@
   <!-- Bootstrap CSS CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
-    .hidden { display: none; }
+    body {
+      background-color: #002b36;
+    }
+    .container {
+      background: #002228;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      width: 50%;
+    }
+    .input-group {
+      width: 40%;
+    }
+    .input-group .form-select {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    .input-group .btn {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+    .text-color-custom {
+      color: #a5bcbe;
+    }
+
+    .form-select, .form-control {
+      --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23073642' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+      background-color: #adb5bd;
+      color: #073642;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 0.375rem;
+    }
+
+    .btn-primary {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #b58900;
+      --bs-btn-border-color: #b58900;
+      --bs-btn-hover-bg: #9a7400;
+    }
+
+    .btn-success {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #2aa198;
+      --bs-btn-border-color: #2aa198;
+      --bs-btn-hover-bg: #248981;
+    }
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
-<header class="bg-light py-3 mb-4 border-bottom">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="h3">OweTracker</h1>
-      <nav class="nav">
-        <a class="nav-link" href="/profile">Profile</a>
-        <form action="/api/users/logout" method="post" class="d-inline">
-          <button type="submit" class="btn btn-outline-danger">Logout</button>
-        </form>
-      </nav>
-    </div>
-  </div>
-</header>
 
-<main class="container">
-  <h1 class="text-center mb-4">Create New Expense</h1>
+<main class="container mt-5">
+  <h1 class="mb-4 text-color-custom">Create New Expense</h1>
 
   <form th:action="@{/expenses/save}" method="post">
     <div class="mb-3">
-      <label for="title" class="form-label">Title:</label>
+      <label for="title" class="form-label text-color-custom">Title:</label>
       <input type="text" id="title" name="title" class="form-control" th:value="${expense.title}" required />
     </div>
 
     <div class="mb-3">
-      <label for="description" class="form-label">Description:</label>
+      <label for="description" class="form-label text-color-custom">Description:</label>
       <textarea id="description" name="description" class="form-control" th:text="${expense.description}"></textarea>
     </div>
 
-    <!-- Split Equally Checkbox -->
     <div class="mb-3 form-check">
       <input type="checkbox" id="splitEqually" name="splitEqually" class="form-check-input" onclick="toggleAmountInput()" />
-      <label for="splitEqually" class="form-check-label">Split Equally</label>
+      <label for="splitEqually" class="form-check-label text-color-custom">Split Equally</label>
     </div>
 
     <!-- Total Amount (only visible if 'Split Equally' is checked) -->
     <div id="totalAmountField" class="mb-3 hidden">
-      <label for="totalAmount" class="form-label">Total Amount:</label>
+      <label for="totalAmount" class="form-label text-color-custom">Total Amount:</label>
       <input type="number" id="totalAmount" name="totalAmount" class="form-control" step="0.01" min="0" />
     </div>
 
-    <!-- Dropdown to select users -->
     <div class="mb-3">
-      <label for="userDropdown" class="form-label">Add Friend:</label>
+      <label for="userDropdown" class="form-label text-color-custom">Add Friend:</label>
       <div class="input-group">
         <select id="userDropdown" class="form-select" name="participantsIds" multiple>
           <option th:each="friend : ${friends}" th:value="${friend.id}" th:text="${friend.username}"></option>
@@ -62,11 +95,8 @@
       </div>
     </div>
 
-
-    <!-- Selected Users List (Dynamically added users will appear here) -->
     <div id="selectedUsers" class="mb-4"></div>
 
-    <!-- Submit button -->
     <div>
       <button type="submit" class="btn btn-success">Create Expense</button>
     </div>
@@ -104,7 +134,7 @@
     userDiv.className = 'mb-2 border p-2 rounded';
     userDiv.innerHTML = `
       <div class="d-flex justify-content-between align-items-center">
-        <label>${selectedUserText}</label>
+        <label style="color: white;">${selectedUserText}</label>
         <div class="d-flex align-items-center">
           <input type="hidden" name="users" value="${selectedUserId}" />
           <input type="number" name="userAmounts" class="form-control user-amount me-2" step="0.01" min="0" placeholder="Enter amount" />
@@ -122,5 +152,6 @@
   }
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

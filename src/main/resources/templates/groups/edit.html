@@ -165,7 +165,7 @@
           <form th:if="${member.id != creatorId}" th:action="@{/groups/edit}" method="post" style="display:inline;">
             <input type="hidden" name="groupId" th:value="${group.id}" />
             <input type="hidden" name="usersToKick" th:value="${member.id}" />
-            <button type="submit" name="action" value="kick" class="btn btn-warning btn-sm">Remove</button>
+            <button type="submit" name="action" value="kick" class="btn btn-danger btn-sm">Remove</button>
           </form>
         </div>
       </li>
@@ -186,7 +186,7 @@
   </form>
 
   <form th:action="@{/groups/{groupId}/delete(groupId=${group.id})}" method="post" class="mb-4">
-    <button type="submit" class="btn btn-warning">Delete Group</button>
+    <button type="submit" class="btn btn-danger">Delete Group</button>
   </form>
 
   <a th:href="@{/groups}" class="btn btn-secondary">Back to Groups</a>
