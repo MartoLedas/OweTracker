@@ -3,42 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Groups</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>OweTracker - My Groups</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #002b36;
+        }
+        .text-color-custom {
+            color: #a5bcbe;
+        }
+        .btn-primary {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #b58900;
+            --bs-btn-border-color: #b58900;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #9a7400;
+            --bs-btn-hover-border-color: #916e00;
+            --bs-btn-focus-shadow-rgb: 192, 155, 38;
+        }
+        .btn-info {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #2aa198;
+            --bs-btn-border-color: #2aa198;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #248981;
+            --bs-btn-hover-border-color: #22817a;
+            --bs-btn-focus-shadow-rgb: 74, 175, 167;
+        }
+        .btn-warning {
+            --bs-btn-color: #fff;
+            --bs-btn-bg: #dc3545;
+            --bs-btn-border-color: #dc3545;
+            --bs-btn-hover-color: #fff;
+            --bs-btn-hover-bg: #c82333;
+            --bs-btn-hover-border-color: #bd2130;
+        }
+        .form-control {
+            color: #073642;
+            background-color: #adb5bd;
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+        .card-header {
+            background-color: #002228;
+            color: #a5bcbe;
+        }
+        .table {
+            --bs-table-color: #fff;
+            --bs-table-bg: #00232a;
+            --bs-table-border-color: #073642;
+            --bs-table-striped-color: #fff;
+            --bs-table-striped-bg: rgba(19, 64, 75, 0.05);
+            --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+            width: 70%;
+            margin-bottom: 1rem;
+            border-color: #fff;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(21, 70, 83, 0.15);
+        }
+        table td:last-child, table th:last-child {
+            width: 1%;
+            white-space: nowrap;
+        }
+        .table td:first-child,
+        .table th:first-child {
+            width: 8%;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+
 <div class="container mt-5">
-    <h1>My Groups</h1>
-    <table class="table">
+    <h1 style="margin-bottom: 50px;" class="text-color-custom">My Groups</h1>
+
+    <table class="table table-striped">
         <thead>
         <tr>
-            <th>#</th>
-            <th>Title</th>
-            <th>Actions</th>
+            <th class="text-color-custom">#</th>
+            <th class="text-color-custom">Title</th>
+            <th class="text-color-custom">Actions</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="entry : ${groupsWithCreatorFlag}">
             <td th:text="${entry.key.id}"></td>
-
             <td th:text="${entry.key.title}"></td>
-
             <td>
                 <a th:href="@{/groups/details/{groupId}(groupId=${entry.key.id})}" class="btn btn-info">Details</a>
-
                 <a th:if="${entry.value}" th:href="@{/groups/{groupId}/edit(groupId=${entry.key.id})}" class="btn btn-primary">Edit Group</a>
-
                 <form th:action="@{/groups/{groupId}/leave(groupId=${entry.key.id})}" method="post" style="display:inline;">
                     <button type="submit" class="btn btn-warning">Leave Group</button>
                 </form>
-
-
-                <!--                <a th:if="${!entry.value}" th:href="@{/groups/{groupId}/leave(groupId=${entry.key.id})}" class="btn btn-warning">Leave Group</a>-->
             </td>
         </tr>
         </tbody>
-
     </table>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>
