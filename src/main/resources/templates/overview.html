@@ -28,6 +28,12 @@
         .negative {
             color: red;
         }
+        #overviewChart {
+            max-width: 550px; /* Set desired width */
+            max-height: 550px; /* Set desired height */
+            width: 100%; /* Responsive */
+            height: auto; /* Maintain aspect ratio */
+        }
 
     </style>
 </head>
@@ -57,7 +63,7 @@
 
     <div class="container">
         <div class="row mt-4 justify-content-center">
-            <div class="col-md-7">
+            <div class="col-md-7 d-flex justify-content-center">
                 <canvas id="overviewChart"></canvas>
             </div>
         </div>
