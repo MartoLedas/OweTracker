@@ -7,66 +7,75 @@
   <!-- Bootstrap CSS CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <style>
-    .table-container {
+    /* Solarized color scheme */
+    body {
+      background-color: #002b36;
+    }
+    .text-color-custom {
+      color: #a5bcbe;
+    }
+    .btn-primary {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #b58900;
+      --bs-btn-border-color: #b58900;
+      --bs-btn-hover-color: #fff;
+      --bs-btn-hover-bg: #9a7400;
+      --bs-btn-hover-border-color: #916e00;
+    }
+    .btn-danger {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #dc3545;
+      --bs-btn-border-color: #dc3545;
+    }
+    .btn-success {
+      --bs-btn-color: #fff;
+      --bs-btn-bg: #2aa198;
+      --bs-btn-border-color: #2aa198;
+      --bs-btn-hover-bg: #248981;
+    }
+    .form-control {
+      color: #073642;
+      background-color: #adb5bd;
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+    .table {
+      --bs-table-color: #fff;
+      --bs-table-bg: #002b36;
+      --bs-table-border-color: #073642;
+      --bs-table-hover-color: #fff;
+      --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
       width: 100%;
-      margin-left: 0;
-      display: none; /* Hide the table initially */
+      vertical-align: top;
+      border-color: #ffff;
     }
-    .text-right {
-      text-align: right;
+    .table-light {
+      background-color: #002228;
     }
-    .text-center {
-      text-align: center;
-    }
-    th {
-      text-align: left !important;
+    th, td {
+      color: #a5bcbe;
     }
     .delete-btn {
       display: none;
       position: absolute;
       z-index: 1000;
+      background-color: #dc3545;
+      color: #fff;
     }
-    /* Equal width for both buttons */
-    .btn-sm {
-      width: 80px; /* You can adjust this value as per your design */
-    }
-    /* Centering the Edit button */
-    .edit-btn-container {
-      display: flex;
-      justify-content: center;
-    }
-    /* Notification styling */
     .no-expenses-notification {
       text-align: center;
       font-size: 1.5rem;
       color: #6c757d;
       margin-top: 20px;
-      display: none; /* Hide the notification initially */
+      display: none;
     }
   </style>
 </head>
 <body>
-<!-- Header with Navigation -->
-<header class="bg-light py-3 mb-4 border-bottom">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <h1 class="h3">OweTracker</h1>
-      <nav class="nav">
-        <a class="nav-link" href="/profile">Profile</a>
-        <a class="nav-link" href="/friends">Friends</a>
-        <a class="nav-link" href="/groups">Groups</a>
-        <a class="nav-link" href="/expenses/create">Create expense</a>
-        <form action="/api/users/logout" method="post" class="d-inline">
-          <button type="submit" class="btn btn-outline-danger">Logout</button>
-        </form>
-      </nav>
-    </div>
-  </div>
-</header>
+<div th:replace="fragments/header :: header"></div>
 
 <section class="container mt-5" id="expenses-section">
   <div class="mb-3">
-    <h4 class="text-start">My Expenses</h4>
+    <h4 class="text-start text-color-custom">My Expenses</h4>
   </div>
 
   <div class="table-container table-responsive" id="table-container">
@@ -81,7 +90,6 @@
         <th>Payment to/from</th>
         <th>Status</th>
         <th>Status Update</th>
-        <th class="text-center">Details</th>
       </tr>
       </thead>
       <tbody>
@@ -90,7 +98,7 @@
     </table>
   </div>
 
-  <div id="no-expenses" class="no-expenses-notification">
+  <div id="no-expenses" class="no-expenses-notification text-color-custom">
     You currently have no expenses.
   </div>
 
@@ -146,7 +154,6 @@
            <td>${expense.paidBy || 'N/A'}</td>
            <td>${expense.status}</td>
            <td class="edit-btn-container">${editButtonHtml}</td>
-           <td class="text-center"><button class="btn btn-primary btn-sm" onclick="showDetails(${expense.id})">Details</button></td>
          `;
                 tableBody.appendChild(row);
               });
@@ -261,37 +268,6 @@
     statusCell.textContent = newStatus;
     button.textContent = 'Edit';
     button.onclick = () => editStatus(button);
-  }
-
-
-  function showDetails(id) {
-    fetch(`/api/expenses/${id}`)
-            .then(response => response.json())
-            .then(expense => {
-              alert(`
-         Title: ${expense.title}\n
-         Description: ${expense.description}\n
-         Amount: ${expense.amount}\n
-         Paid by: ${expense.paidBy}\n
-         Status: ${expense.status}\n
-         Created at: ${new Date(expense.createdAt).toLocaleString()}
-       `);
-            });
-  }
-
-function showDetails(id) {
-    fetch(`/api/expenses/${id}`)
-            .then(response => response.json())
-            .then(expense => {
-              alert(`
-          Title: ${expense.title}\n
-          Description: ${expense.description}\n
-          Amount: ${expense.amount}\n
-          Paid by: ${expense.paidBy}\n
-          Status: ${expense.status}\n
-          Created at: ${new Date(expense.createdAt).toLocaleString()}
-        `);
-            });
   }
 </script>
 
