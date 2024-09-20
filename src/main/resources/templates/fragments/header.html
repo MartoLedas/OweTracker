@@ -1,0 +1,70 @@
+<header style="background-color: #002228; padding: 1rem 30px; margin-bottom: 1.5rem; ">
+  <div class="d-flex justify-content-between align-items-center">
+    <!-- Logo -->
+    <a class="navbar-brand h3" href="/home">
+      <img src="/images/logoheader.png" alt="Logo" style="height: 40px;">
+    </a>
+
+    <!-- Navigation -->
+    <nav class="nav">
+      <ul class="navbar-nav d-flex flex-row align-items-center">
+        <!-- If the user is logged in -->
+        <li th:if="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/expensesview" style="color: #a5bcbe; transition: color 0.3s;">My Expenses</a>
+        </li>
+
+        <!-- Dropdown for creating expenses (only when logged in) -->
+        <li th:if="${session.userId != null}" class="nav-item dropdown mx-3">
+          <a class="nav-link dropdown-toggle" href="#" id="createExpenseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #a5bcbe; transition: color 0.3s;">
+            Create Expense
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="createExpenseDropdown" style="background-color: #002228;">
+            <li><a class="dropdown-item" href="/expenses/create" style="color: #a5bcbe; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#004d4d';" onmouseout="this.style.backgroundColor='#002228';">Create Expense</a></li>
+            <li><a class="dropdown-item" href="/expenses/create-group-expense" style="color: #a5bcbe; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#004d4d';" onmouseout="this.style.backgroundColor='#002228';">Create Group Expense</a></li>
+          </ul>
+        </li>
+
+        <!-- Friends link (only when logged in) -->
+        <li th:if="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/friends" style="color: #a5bcbe; transition: color 0.3s;">Friends</a>
+        </li>
+
+        <!-- Dropdown for groups (only when logged in) -->
+        <li th:if="${session.userId != null}" class="nav-item dropdown mx-3">
+          <a class="nav-link dropdown-toggle" href="#" id="groupsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #a5bcbe; transition: color 0.3s;">
+            Groups
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="groupsDropdown" style="background-color: #002228;">
+            <li><a class="dropdown-item" href="/groups" style="color: #a5bcbe; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#004d4d';" onmouseout="this.style.backgroundColor='#002228';">My Groups</a></li>
+            <li><a class="dropdown-item" href="/groups/create" style="color: #a5bcbe; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#004d4d';" onmouseout="this.style.backgroundColor='#002228';">Create Group</a></li>
+          </ul>
+        </li>
+
+        <!-- Overview link (only when logged in) -->
+        <li th:if="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/overview" style="color: #a5bcbe; transition: color 0.3s;">Overview</a>
+        </li>
+
+        <!-- Profile and Logout (only when logged in) -->
+        <li th:if="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/profile" style="color: #a5bcbe; transition: color 0.3s;">Profile</a>
+        </li>
+
+        <li th:if="${session.userId != null}" class="nav-item mx-3">
+          <form th:action="@{/api/users/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger">Logout</button>
+          </form>
+        </li>
+
+        <!-- If the user is NOT logged in, show Login and Register -->
+        <li th:unless="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/login" style="color: #a5bcbe; transition: color 0.3s;">Login</a>
+        </li>
+
+        <li th:unless="${session.userId != null}" class="nav-item mx-3">
+          <a class="nav-link" href="/register" style="color: #a5bcbe; transition: color 0.3s;">Register</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>

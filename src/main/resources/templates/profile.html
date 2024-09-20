@@ -52,22 +52,7 @@
     </style>
 </head>
 <body>
-<header class="bg-light py-3 mb-4 border-bottom">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center">
-            <h1 class="h3">OweTracker</h1>
-            <nav class="nav">
-                <a class="nav-link" href="/register">Register</a>
-                <a class="nav-link" href="/login">Login</a>
-                <a class="nav-link" href="/profile">Profile</a>
-                <a class="nav-link" href="/friends">Friends</a>
-                <form action="/api/users/logout" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-outline-danger">Logout</button>
-                </form>
-            </nav>
-        </div>
-    </div>
-</header>
+<div th:replace="fragments/header :: header"></div>
 
 <main class="container">
     <div class="row justify-content-center">

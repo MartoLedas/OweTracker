@@ -53,7 +53,7 @@
   </style>
 </head>
 <body>
-
+<div th:replace="fragments/header :: header"></div>
 <main class="container mt-5">
   <h1 class="mb-4 text-color-custom">Create New Group Expense</h1>
 
@@ -140,6 +140,6 @@
   // Initially load group members for the default group
   window.onload = loadGroupMembers;
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
