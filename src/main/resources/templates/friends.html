@@ -140,8 +140,7 @@
                 <thead>
                 <tr>
                     <th class="text-color-custom">Name</th>
-                    <th class="text-color-custom">You Owe</th>
-                    <th class="text-color-custom">Owes You</th>
+                    <th class="text-color-custom">Balance</th>
                     <th class="text-color-custom">Remove</th>
                 </tr>
                 </thead>
@@ -174,10 +173,12 @@
                 } else {
                     friends.forEach(friend => {
                         const friendRow = document.createElement('tr');
+                            const balance = friend.totalOwedByFriend - friend.totalOwedToFriend;
+                            const balanceClass = balance >= 0 ? '+' : ''; // Positive: Owed to user, Negative: Owes the friend
+
                         friendRow.innerHTML = `
                             <td>${friend.friendUsername}</td>
-                            <td class="amount-due">${friend.totalOwedByFriend.toFixed(2)} €</td>
-                            <td class="amount-owed">${friend.totalOwedToFriend.toFixed(2)} €</td>
+                            <td class="${balanceClass}">${balanceClass}${balance.toFixed(2)} €</td>
                             <td><button onclick="removeFriend(${friend.friendId})" class="btn btn-danger btn-sm">Remove</button></td>
                         `;
                         friendsTableBody.appendChild(friendRow);
