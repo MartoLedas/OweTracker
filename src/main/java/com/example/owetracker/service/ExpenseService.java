@@ -189,16 +189,13 @@ public class ExpenseService {
         User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Fetch individual and group expenses
         List<Expense> expensesCreatedByUser = expenseRepository.findByPaidById(currentUser.getId());
         List<ExpenseUser> expensesWhereUserMustPay = expenseUserRepository.findByUserId(currentUser.getId().longValue());
 
-        // Create a Set to track unique expense IDs and avoid duplicates
         Set<Long> processedExpenseIds = new HashSet<>();
         List<ExpensesView> expenseViews = new ArrayList<>();
 
         for (Expense expense : expensesCreatedByUser) {
-            // Check if we've already processed this expense
             if (!processedExpenseIds.contains(expense.getId())) {
                 processedExpenseIds.add(expense.getId());
 
@@ -207,7 +204,6 @@ public class ExpenseService {
                 String formattedAmount = (expense.getAmount() != null) ? "+" + expense.getAmount().toString() : "N/A";
 
                 if (expense.getGroupId() != null && expense.getAmount() != null) {
-                    // This is a group expense, only show if created by this user
                     Group group = groupRepository.findById(expense.getGroupId())
                             .orElseThrow(() -> new RuntimeException("Group not found"));
 
@@ -224,7 +220,6 @@ public class ExpenseService {
                         ));
                     }
                 } else {
-                    // This is an individual expense
                     if (createdByUser) {
                         List<ExpenseUser> participants = expenseUserRepository.findByExpenseId(expense.getId());
                         if (!participants.isEmpty()) {
@@ -248,16 +243,14 @@ public class ExpenseService {
             }
         }
 
-        // Add individual expenses from ExpenseUser (where user must pay)
         for (ExpenseUser expenseUser : expensesWhereUserMustPay) {
             Expense expense = expenseUser.getExpense();
 
-            // Check if we've already processed this expense
             if (!processedExpenseIds.contains(expense.getId())) {
                 processedExpenseIds.add(expense.getId());
 
                 String paymentFromTo = expense.getPaidBy().getName();
-                String formattedAmount = (expense.getAmount() != null) ? "-" + expense.getAmount().toString() : "N/A";
+                String formattedAmount = (expenseUser.getAmount() != null) ? "-" + expenseUser.getAmount().toString() : "N/A";
 
                 expenseViews.add(new ExpensesView(
                         expense.getCreatedAt(),
@@ -267,12 +260,11 @@ public class ExpenseService {
                         paymentFromTo,
                         expense.getStatus(),
                         expense.getId(),
-                        false // This is not created by the current user
+                        false
                 ));
             }
         }
 
-        // Sort the final list by creation date, descending
         expenseViews.sort(Comparator.comparing(ExpensesView::getCreatedAt).reversed());
 
         return expenseViews;
