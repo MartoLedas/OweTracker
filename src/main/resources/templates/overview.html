@@ -16,6 +16,19 @@
             color: #a5bcbe; /* Custom text color */
         }
 
+        .net-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .positive {
+            color: green;
+        }
+
+        .negative {
+            color: red;
+        }
+
     </style>
 </head>
 <body>
@@ -33,6 +46,15 @@
             <h5>Total amount you owe: -<span id="totalAmountOwedByUser" style="color: red;" th:text="${totalAmountOwedByUser}">0</span> €</h5>
         </div>
     </div>
+
+    <!-- Net total -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <h2 class="text-color-custom">Net Balance</h2>
+            <p id="netTotal" class="net-total">0 €</p>
+        </div>
+    </div>
+
     <div class="container">
         <div class="row mt-4 justify-content-center">
             <div class="col-md-7">
@@ -47,6 +69,23 @@
         var totalOwedToUser = parseFloat(document.getElementById('totalOwedToUser').textContent);
         var totalAmountOwedByUser = parseFloat(document.getElementById('totalAmountOwedByUser').textContent);
 
+        // Calculate the net balance
+        var netTotal = totalOwedToUser - totalAmountOwedByUser;
+
+        // Update the net balance display
+        var netTotalElement = document.getElementById('netTotal');
+        netTotalElement.textContent = netTotal.toFixed(2) + ' €';
+
+        // Change text color based on whether the net total is positive or negative
+        if (netTotal >= 0) {
+            netTotalElement.classList.add('positive');
+            netTotalElement.classList.remove('negative');
+        } else {
+            netTotalElement.classList.add('negative');
+            netTotalElement.classList.remove('positive');
+        }
+
+        // Initialize the chart
         var ctx = document.getElementById('overviewChart').getContext('2d');
         new Chart(ctx, {
             type: 'pie',
@@ -55,7 +94,7 @@
                 datasets: [{
                     label: 'Financial Overview',
                     data: [totalOwedToUser, totalAmountOwedByUser],
-                    backgroundColor: ['#2aa198', '#cb4b16'],
+                    backgroundColor: ['#2aa198', 'red'],
                     borderColor: '#fff',
                     borderWidth: 1
                 }]
@@ -72,7 +111,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(tooltipItem) {
-                                return tooltipItem.label + ': $' + tooltipItem.raw.toFixed(2);
+                                return tooltipItem.label + ': €' + tooltipItem.raw.toFixed(2);
                             }
                         }
                     }
